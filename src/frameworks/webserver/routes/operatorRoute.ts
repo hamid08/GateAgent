@@ -192,4 +192,148 @@ export default async function routes(app: Express) {
     app.post('/api/operator/gates/:gateId/scanTicket/online', operatorController().scanTicketOnline);
 
 
+
+    /** POST Methods */
+    /**
+     * @openapi
+     * '/api/operator/gates/{gateId}/identificationProcess/grid':
+     *  post:
+     *     tags:
+     *     - Operator Panel
+     *     summary: get  identificationProcess Grid
+     *     parameters:
+     *      - name: gateId
+     *        in: path
+     *        description: The unique Id of the gate
+     *        required: true
+     *      - name: dateTime
+     *        in: query
+     *        description: Type of Date
+     *        required: false
+     *        schema:
+     *          type: Date
+     *          default: ''
+     *      - name: name
+     *        in: query
+     *        description: Type of string
+     *        required: false
+     *        schema:
+     *          type: string
+     *          default: ''
+     *      - name: status
+     *        in: query
+     *        description: Type of number
+     *        required: false
+     *        schema:
+     *          type: number
+     *      - name: plaqueNo
+     *        in: query
+     *        description: Type of string
+     *        required: false
+     *        schema:
+     *          type: string
+     *          default: ''
+     *      - name: trafficType
+     *        in: query
+     *        description: Type of number
+     *        required: false
+     *        schema:
+     *          type: number
+     *     requestBody:
+     *      required: true
+     *      content:
+     *        application/json:
+     *           schema:
+     *            type: object
+     *            required:
+     *              - searchTerm
+     *              - pageIndex
+     *              - pageSize
+     *            properties:
+     *              searchTerm:
+     *                type: string
+     *              pageIndex:
+     *                type: number
+     *              pageSize:
+     *                type: number
+     *     responses:
+     *      201:
+     *        description: Created
+     *      409:
+     *        description: Conflict
+     *      404:
+     *        description: Not Found
+     *      500:
+     *        description: Server Error
+     */
+
+    app.post('/api/operator/gates/:gateId/identificationProcess/grid', operatorController().identificationProcessGrid);
+
+
+
+    /** POST Methods */
+    /**
+     * @openapi
+     * '/api/operator/gates/{gateId}/offlineTraffics/grid':
+     *  post:
+     *     tags:
+     *     - Operator Panel
+     *     summary: get  offlineTraffics Grid
+     *     parameters:
+     *      - name: gateId
+     *        in: path
+     *        description: The unique Id of the gate
+     *        required: true
+     *      - name: dateTime
+     *        in: query
+     *        description: Type of Date
+     *        required: false
+     *        schema:
+     *          type: Date
+     *          default: ''
+     *      - name: tripNumber
+     *        in: query
+     *        description: Type of string
+     *        required: false
+     *        schema:
+     *          type: string
+     *          default: ''
+     *      - name: plaqueNo
+     *        in: query
+     *        description: Type of string
+     *        required: false
+     *        schema:
+     *          type: string
+     *          default: ''
+     *     requestBody:
+     *      required: true
+     *      content:
+     *        application/json:
+     *           schema:
+     *            type: object
+     *            required:
+     *              - searchTerm
+     *              - pageIndex
+     *              - pageSize
+     *            properties:
+     *              searchTerm:
+     *                type: string
+     *              pageIndex:
+     *                type: number
+     *              pageSize:
+     *                type: number
+     *     responses:
+     *      201:
+     *        description: Created
+     *      409:
+     *        description: Conflict
+     *      404:
+     *        description: Not Found
+     *      500:
+     *        description: Server Error
+     */
+
+    app.post('/api/operator/gates/:gateId/offlineTraffics/grid', operatorController().offlineTrafficsGrid);
+
+
 }

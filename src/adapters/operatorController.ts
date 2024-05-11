@@ -3,6 +3,12 @@ import { faildResult, successResult } from '../application/utils/apiResult';
 import operatorService from '../application/services/operatorService';
 
 
+import {
+    IdentificationProcessGridFilterModel,
+    OfflineTrafficsGridFilterModel
+
+} from '../application/models/operatorModels';
+
 export default function operatorController() {
 
 
@@ -121,13 +127,75 @@ export default function operatorController() {
     };
 
 
+
+    const identificationProcessGrid = async (req: any, res: any, next: any) => {
+        try {
+            const { searchTerm, pageIndex, pageSize } = req.body;
+            const { dateTime, name, plaqueNo } = req.query;
+
+            const { gateId } = req.params;
+
+            const status = Number(req.query.status);
+            const trafficType = Number(req.query.trafficType);
+
+
+            res.status(200).send(successResult('', await operatorService()
+                .identificationProcessGrid(gateId, new IdentificationProcessGridFilterModel(
+                    searchTerm,
+                    pageIndex,
+                    pageSize,
+                    dateTime,
+                    name,
+                    status,
+                    plaqueNo,
+                    trafficType
+
+                ))));
+
+        } catch (error: any) {
+            console.error(error);
+            res.status(200).send(faildResult(error.message));
+        }
+    };
+
+
+    const offlineTrafficsGrid = async (req: any, res: any, next: any) => {
+        try {
+            const { searchTerm, pageIndex, pageSize } = req.body;
+            const { dateTime, tripNumber, plaqueNo } = req.query;
+
+            const { gateId } = req.params;
+
+
+
+            res.status(200).send(successResult('', await operatorService()
+                .offlineTrafficsGrid(gateId, new OfflineTrafficsGridFilterModel(
+                    searchTerm,
+                    pageIndex,
+                    pageSize,
+                    plaqueNo,
+                    dateTime,
+                    tripNumber,
+
+                ))));
+
+        } catch (error: any) {
+            console.error(error);
+            res.status(200).send(faildResult(error.message));
+        }
+    };
+
+
+
     return {
         getGates,
         getGateDetailsById,
         connectionTest,
         getLivePlaqueImage,
         scanTicketOffline,
-        scanTicketOnline
+        scanTicketOnline,
+        identificationProcessGrid,
+        offlineTrafficsGrid
     }
 
 }

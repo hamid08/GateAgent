@@ -4,9 +4,145 @@ import {
     IdentifierConnectionStatus,
     GateIdentificationType,
     IdentityResultType,
-    IdentityMessageType
+    IdentityMessageType,
+    IdentificationProcessStatus,
+    IdentificationProcessTrafficType,
+    VehiclePlaqueType
 
 } from '../enums/gateEnum';
+
+import { BaseGridFilterModel } from './baseModels';
+
+
+export class IdentificationProcessGridFilterModel extends BaseGridFilterModel {
+
+    constructor(
+        searchTerm: string,
+        pageIndex: number = 1,
+        pageSize: number = 10,
+        dateTime?: Date,
+        name?: string,
+        status?: IdentificationProcessStatus,
+        plaqueNo?: string,
+        trafficType?: IdentificationProcessTrafficType,
+
+
+    ) {
+        super(searchTerm, pageIndex, pageSize);
+
+        this.dateTime = dateTime;
+        this.name = name;
+        this.status = status;
+        this.plaqueNo = plaqueNo;
+        this.trafficType = trafficType;
+    }
+
+    dateTime?: Date;
+    name?: string;
+    status?: IdentificationProcessStatus;
+    plaqueNo?: string;
+    trafficType?: IdentificationProcessTrafficType;
+}
+
+
+export class IdentificationProcessGridModel {
+
+    constructor(
+        dateTime: Date,
+        name: string,
+        status: IdentificationProcessStatus,
+        plaqueNo: string,
+        plaqueType: VehiclePlaqueType,
+        driverFullName: string,
+        vehicleUserType: string,
+        trafficType: IdentificationProcessTrafficType,
+
+    ) {
+
+        this.dateTime = dateTime;
+        this.name = name;
+        this.plaqueNo = plaqueNo;
+        this.plaqueType = plaqueType;
+        this.status = status;
+        this.driverFullName = driverFullName;
+        this.vehicleUserType = vehicleUserType;
+        this.trafficType = trafficType;
+
+    }
+
+    dateTime: Date;
+    name: string;
+    status: IdentificationProcessStatus;
+    plaqueNo: string;
+    plaqueType: VehiclePlaqueType;
+    driverFullName: string;
+    vehicleUserType: string;
+    trafficType: IdentificationProcessTrafficType;
+
+}
+
+
+export class OfflineTrafficsGridFilterModel extends BaseGridFilterModel {
+
+    constructor(
+        searchTerm: string,
+        pageIndex: number = 1,
+        pageSize: number = 10,
+
+        plaqueNo?: string,
+        dateTime?: Date,
+        tripNumber?: string,
+
+
+    ) {
+        super(searchTerm, pageIndex, pageSize);
+
+        this.plaqueNo = plaqueNo;
+        this.dateTime = dateTime;
+        this.tripNumber = tripNumber;
+    }
+
+    plaqueNo?: string;
+    dateTime?: Date;
+    tripNumber?: string;
+}
+
+
+
+export class OfflineTrafficsGridModel {
+
+    constructor(
+        plaqueNo: string,
+        plaqueType: VehiclePlaqueType,
+        vehicleIdentity: string,
+        driverFullName: string,
+        dateTime: Date,
+        tripNumber: string,
+
+    ) {
+
+        this.dateTime = dateTime;
+        this.tripNumber = tripNumber;
+        this.plaqueNo = plaqueNo;
+        this.vehicleIdentity = vehicleIdentity;
+        this.plaqueType = plaqueType;
+        this.driverFullName = driverFullName;
+
+    }
+
+    dateTime: Date;
+    vehicleIdentity: string;
+
+    tripNumber: string;
+    plaqueNo: string;
+    plaqueType: VehiclePlaqueType;
+    driverFullName: string;
+
+}
+
+
+
+
 
 
 export class LivePlaqueImage {

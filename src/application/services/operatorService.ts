@@ -6,11 +6,18 @@ import {
     StatusConnectionCard,
     LivePlaqueImage,
     Operator_IdentityResultBoxInfo_Model,
-    Operator_IdentityResultBox_Model
+    Operator_IdentityResultBox_Model,
+    IdentificationProcessGridModel,
+    IdentificationProcessGridFilterModel,
+
+    OfflineTrafficsGridFilterModel,
+    OfflineTrafficsGridModel
 
 } from '../models/operatorModels';
 
 import { getConnectedSocket } from '../../frameworks/services/socket/connection';
+import { GridResultModel } from '../models/baseModels';
+
 
 import {
     GateIdentificationType,
@@ -137,6 +144,31 @@ export default function gateService() {
     }
 
 
+    const identificationProcessGrid = async (gateId: string, filterModel: IdentificationProcessGridFilterModel)
+        : Promise<GridResultModel> => {
+        try {
+            return await operatorRepository().identificationProcessGrid(gateId, filterModel);
+
+        } catch (error) {
+            console.error(error)
+            throw new Error();
+
+        }
+    };
+
+    const offlineTrafficsGrid = async (gateId: string, filterModel: OfflineTrafficsGridFilterModel)
+        : Promise<GridResultModel> => {
+        try {
+            return await operatorRepository().offlineTrafficsGrid(gateId, filterModel);
+
+        } catch (error) {
+            console.error(error)
+            throw new Error();
+
+        }
+    };
+
+
 
     return {
         getGates,
@@ -144,7 +176,9 @@ export default function gateService() {
         connectionTest,
         getLivePlaqueImage,
         scanTicketOffline,
-        scanTicketOnline
+        scanTicketOnline,
+        identificationProcessGrid,
+        offlineTrafficsGrid
     }
 
 }

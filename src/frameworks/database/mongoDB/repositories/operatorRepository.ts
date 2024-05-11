@@ -4,7 +4,12 @@ import {
     Operator_GateDetails_Model,
     StatusConnectionCardItemTooltipInfo,
     StatusConnectionCardItems,
-    StatusConnectionCard
+    StatusConnectionCard,
+    IdentificationProcessGridFilterModel,
+    IdentificationProcessGridModel,
+
+    OfflineTrafficsGridFilterModel,
+    OfflineTrafficsGridModel
 
 } from '../../../../application/models/operatorModels';
 
@@ -16,6 +21,9 @@ import {
 
 } from '../../../../application/enums/gateEnum';
 import { AnprCamera, RfidAntenna } from "../../../../application/models/smartGateModels";
+
+import { GridResultModel } from '../../../../application/models/baseModels';
+
 
 
 export default function operatorRepository() {
@@ -161,11 +169,156 @@ export default function operatorRepository() {
     }
 
 
+    async function identificationProcessGrid(gateId: string, filterModel: IdentificationProcessGridFilterModel): Promise<GridResultModel> {
+
+        var { searchTerm, pageIndex, pageSize, dateTime,
+            name,
+            status,
+            plaqueNo,
+            trafficType
+        } = filterModel;
+
+        if (pageIndex <= 0) pageIndex = 1;
+        if (pageSize <= 0) pageSize = 10;
+
+        // const query: any = {
+        //     gateId,
+        //     $or: [
+        //         { plaqueNo: { $regex: `.*${searchTerm}.*`, $options: 'i' } },
+        //         { presenterName: { $regex: `.*${searchTerm}.*`, $options: 'i' } },
+        //         { rfidTag: { $regex: `.*${searchTerm}.*`, $options: 'i' } },
+        //         { trafficGroupCaption: { $regex: `.*${searchTerm}.*`, $options: 'i' } },
+        //         { name: { $regex: `.*${searchTerm}.*`, $options: 'i' } },
+        //     ],
+        // };
+
+        // if (fromDate) {
+        //     query.fromDate = { $gte: new Date(fromDate) };
+        // }
+
+        // if (toDate) {
+        //     query.toDate = { $lte: new Date(toDate) };
+        // }
+
+
+        // const documents = await TrafficGroup.find(query)
+        //     .skip((pageIndex - 1) * pageSize)
+        //     .limit(pageSize)
+        //     .sort({ name: 1 })
+        //     .populate('gateId')
+        //     .exec();
+
+
+        // var data = documents.map(document =>
+        //     new TrafficGroupGridModel(
+        //         document.trafficGroupCaption,
+        //         document.plaqueNo,
+        //         document.plaqueType,
+        //         document.plaqueStatus,
+        //         replaceChars(document.rfidTag),
+        //         document.fromDate,
+        //         document.toDate,
+        //         document.name,
+        //         document.presenterName,
+        //         document.description,
+        //         replaceChars(document.cardNumber),
+        //     ));
+
+
+        var data: IdentificationProcessGridModel[] = [];
+
+
+        var total: number = 0;
+
+        try {
+            total = data.length;
+        } catch (error) {
+
+        }
+
+        return new GridResultModel(data, total, pageIndex, pageSize);
+
+
+    }
+
+    async function offlineTrafficsGrid(gateId: string, filterModel: OfflineTrafficsGridFilterModel): Promise<GridResultModel> {
+
+        var { searchTerm, pageIndex, pageSize, dateTime,
+            tripNumber,
+            plaqueNo,
+        } = filterModel;
+
+        if (pageIndex <= 0) pageIndex = 1;
+        if (pageSize <= 0) pageSize = 10;
+
+        // const query: any = {
+        //     gateId,
+        //     $or: [
+        //         { plaqueNo: { $regex: `.*${searchTerm}.*`, $options: 'i' } },
+        //         { presenterName: { $regex: `.*${searchTerm}.*`, $options: 'i' } },
+        //         { rfidTag: { $regex: `.*${searchTerm}.*`, $options: 'i' } },
+        //         { trafficGroupCaption: { $regex: `.*${searchTerm}.*`, $options: 'i' } },
+        //         { name: { $regex: `.*${searchTerm}.*`, $options: 'i' } },
+        //     ],
+        // };
+
+        // if (fromDate) {
+        //     query.fromDate = { $gte: new Date(fromDate) };
+        // }
+
+        // if (toDate) {
+        //     query.toDate = { $lte: new Date(toDate) };
+        // }
+
+
+        // const documents = await TrafficGroup.find(query)
+        //     .skip((pageIndex - 1) * pageSize)
+        //     .limit(pageSize)
+        //     .sort({ name: 1 })
+        //     .populate('gateId')
+        //     .exec();
+
+
+        // var data = documents.map(document =>
+        //     new TrafficGroupGridModel(
+        //         document.trafficGroupCaption,
+        //         document.plaqueNo,
+        //         document.plaqueType,
+        //         document.plaqueStatus,
+        //         replaceChars(document.rfidTag),
+        //         document.fromDate,
+        //         document.toDate,
+        //         document.name,
+        //         document.presenterName,
+        //         document.description,
+        //         replaceChars(document.cardNumber),
+        //     ));
+
+
+        var data: OfflineTrafficsGridModel[] = [];
+
+
+        var total: number = 0;
+
+        try {
+            total = data.length;
+        } catch (error) {
+
+        }
+
+        return new GridResultModel(data, total, pageIndex, pageSize);
+
+
+    }
+    
+
     return {
         getGates,
         getGateDetailsById,
         getStatusConnectionItemsByType,
-        getANPRCamerasByGateId
+        getANPRCamerasByGateId,
+        identificationProcessGrid,
+        offlineTrafficsGrid
     }
 
 }
