@@ -32,6 +32,18 @@ export default function operatorRepository() {
 
     }
 
+    const getANPRCamerasByGateId = async (gateId: string): Promise<AnprCamera[] | null> => {
+
+        const document = await SmartGate.findOne({ identity: gateId });
+
+        if (!document) {
+            return null;
+        }
+
+        return document.anprCameras.map(anpr => new AnprCamera(anpr.caption, anpr.identity, anpr.intervalTime, anpr.ip, anpr.port));
+
+    }
+
     const getStatusConnectionItemsByType = async (gateId: string, type: GateIdentificationType): Promise<StatusConnectionCard | null> => {
 
         const document = await SmartGate.findOne({ identity: gateId });
@@ -152,7 +164,8 @@ export default function operatorRepository() {
     return {
         getGates,
         getGateDetailsById,
-        getStatusConnectionItemsByType
+        getStatusConnectionItemsByType,
+        getANPRCamerasByGateId
     }
 
 }

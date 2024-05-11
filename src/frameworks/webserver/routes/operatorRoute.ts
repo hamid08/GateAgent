@@ -88,4 +88,30 @@ export default async function routes(app: Express) {
     app.get('/api/operator/gates/:gateId/connectionTest', operatorController().connectionTest);
 
 
+
+    /** GET Methods
+         * @openapi
+         * '/api/operator/gates/{gateId}/livePlaqueImage':
+         *  get:
+         *     tags:
+         *     - Operator Panel
+         *     summary: Get Gate By Id
+         *     parameters:
+         *      - name: gateId
+         *        in: path
+         *        description: The unique Id of the gate
+         *        required: true
+         *     responses:
+         *      200:
+         *        description: Fetched successfully
+         *      400:
+         *        description: Bad Request
+         *      404:
+         *        description: Not Found
+         *      500:
+         *        description: Server Error
+         */
+
+    app.get('/api/operator/gates/:gateId/livePlaqueImage', operatorController().getLivePlaqueImage);
+
 }

@@ -16,7 +16,8 @@ const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET as string;
 import {
 
     GateServicesType,
-    SocketStatus
+    SocketStatus,
+    GateIdentificationType, IdentifierConnectionStatus
 
 } from '../../../application/enums/gateEnum';
 
@@ -101,9 +102,9 @@ export const initConnection = () => {
         socket.emit('connected');
 
 
-        var gateService: any = await socketService().getSocketConnectInfoByToken(token);
+        var gateService: SocketModel | null = await socketService().getSocketConnectInfoByToken(token);
 
-        if (gateService && gateService.type != undefined) {
+        if (gateService && gateService != null) {
             console.log(`==> Listener Socket connected By Id ${socket.id}`);
 
             const gateWebSocket = sockets.find(socket => socket.token === gateService?.token);
@@ -111,10 +112,20 @@ export const initConnection = () => {
                 gateService.socket = socket;
                 sockets.push(gateService);
 
+                //Socket To Gate Setting
                 await socketIo.to(config.socket.gateSetting_Address).emit('ServiceSocketStatus', {
                     token: gateService?.token,
                     type: gateService?.type,
                     status: SocketStatus.Connect
+                });
+
+
+                //Socket To Operator Panel
+                await socketIo.emit('IdentificationStatus', {
+                    type: gateService?.type == GateServicesType.ANPRListener ?
+                        GateIdentificationType.ANPR : GateIdentificationType.RFID,
+
+                    status: IdentifierConnectionStatus.Connect
                 });
             }
 
@@ -134,11 +145,22 @@ export const initConnection = () => {
 
 
             if (socketInfo?.type != GateServicesType.GateWeb) {
+
+                //Socket To Gate Setting
                 await socketIo.to(config.socket.gateSetting_Address).emit('ServiceSocketStatus', {
                     token: socketInfo?.token,
                     type: socketInfo?.type,
                     status: SocketStatus.Disconnect
                 });
+
+                //Socket To Operator Panel
+                await socketIo.emit('IdentificationStatus', {
+                    type: socketInfo?.type == GateServicesType.ANPRListener ?
+                        GateIdentificationType.ANPR : GateIdentificationType.RFID,
+
+                    status: IdentifierConnectionStatus.Disconnect
+                });
+
             }
 
 
@@ -172,6 +194,25 @@ export const initConnection = () => {
 
 
         });
+
+
+        socket.on('HFCard', (data: any) => {
+            // sendToScreen(data)
+            console.log(JSON.stringify(data));
+          
+
+        });
+
+
+
+        //عدم قابلیت باز کردن مودال آفلاین
+        socket.on('OfflineModeFailed', (data: any) => {
+            // sendToScreen(data)
+            console.log(JSON.stringify(data));
+          
+
+        });
+
 
     });
 }

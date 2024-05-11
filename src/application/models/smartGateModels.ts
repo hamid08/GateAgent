@@ -409,3 +409,17 @@ export class ANPRDataModel {
   DateTime: Date;
 
 }
+
+export class HFDataModel {
+
+  constructor(cardNo: string,gateId: string, dateTime: Date) {
+    this.cardNo = cardNo;
+    this.gateId = gateId;
+    this.dateTime = dateTime;
+  }
+
+  cardNo: string;
+  gateId: string;
+  dateTime: Date;
+
+}

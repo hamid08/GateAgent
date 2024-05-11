@@ -7,6 +7,28 @@ import {
 } from '../enums/gateEnum';
 
 
+export class LivePlaqueImage {
+
+    constructor(
+        image: string,
+        gateId: string,
+        dateTime: Date,
+
+    ) {
+
+        this.image = image;
+        this.gateId = gateId;
+        this.dateTime = dateTime;
+
+    }
+
+    image: string;
+    gateId: string;
+    dateTime: Date;
+
+}
+
+
 export class Operator_Gate_Model {
 
     constructor(
