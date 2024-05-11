@@ -2,7 +2,9 @@
 import {
     TaxiWorkModeOperation,
     IdentifierConnectionStatus,
-    GateIdentificationType
+    GateIdentificationType,
+    IdentityResultType,
+    IdentityMessageType
 
 } from '../enums/gateEnum';
 
@@ -27,6 +29,49 @@ export class LivePlaqueImage {
     dateTime: Date;
 
 }
+
+export class Operator_IdentityResultBoxInfo_Model {
+
+    constructor(
+        name: string,
+        vehicleIdentity: string,
+
+    ) {
+
+        this.name = name;
+        this.vehicleIdentity = vehicleIdentity;
+    }
+
+    name: string;
+    vehicleIdentity: string;
+
+}
+
+
+export class Operator_IdentityResultBox_Model {
+
+    constructor(
+        type: IdentityResultType,
+        messageType: IdentityMessageType,
+        description: string,
+        identityInfo: Operator_IdentityResultBoxInfo_Model,
+
+    ) {
+
+        this.type = type;
+        this.messageType = messageType;
+        this.description = description;
+        this.identityInfo = identityInfo;
+
+    }
+
+    type: IdentityResultType;
+    messageType: IdentityMessageType;
+    description: string;
+    identityInfo: Operator_IdentityResultBoxInfo_Model;
+
+}
+
 
 
 export class Operator_Gate_Model {

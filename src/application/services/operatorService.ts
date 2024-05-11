@@ -4,7 +4,9 @@ import {
     Operator_Gate_Model,
     Operator_GateDetails_Model,
     StatusConnectionCard,
-    LivePlaqueImage
+    LivePlaqueImage,
+    Operator_IdentityResultBoxInfo_Model,
+    Operator_IdentityResultBox_Model
 
 } from '../models/operatorModels';
 
@@ -14,6 +16,8 @@ import {
     GateIdentificationType,
     GateServicesType,
     IdentifierConnectionStatus,
+    IdentityMessageType,
+    IdentityResultType,
 
 } from '../enums/gateEnum';
 
@@ -45,6 +49,33 @@ export default function gateService() {
         return null;
 
     }
+
+    const scanTicketOffline = async (gateId: string, tripNumber: string): Promise<Operator_IdentityResultBox_Model> => {
+
+        //TODO Save InDb Information And Finish Process
+
+
+
+
+        return new Operator_IdentityResultBox_Model(IdentityResultType.Success, IdentityMessageType.AllowedToPass, 'اختصاص سفر به راننده با موفقیت انجام شد',
+            new Operator_IdentityResultBoxInfo_Model('علی حیدری', '1A4Bn')
+        );
+
+    }
+
+
+    const scanTicketOnline = async (gateId: string, tripNumber: string): Promise<Operator_IdentityResultBox_Model> => {
+
+        //TODO Send Request To Get Service 
+
+
+        return new Operator_IdentityResultBox_Model(IdentityResultType.Success, IdentityMessageType.AllowedToPass, 'اختصاص سفر به راننده با موفقیت انجام شد',
+            new Operator_IdentityResultBoxInfo_Model('علی حیدری', '1A4Bn')
+        );
+
+    }
+
+
 
     const getGateDetailsById = async (gateId: string): Promise<Operator_GateDetails_Model | null> => {
         var data = await operatorRepository().getGateDetailsById(gateId);
@@ -111,7 +142,9 @@ export default function gateService() {
         getGates,
         getGateDetailsById,
         connectionTest,
-        getLivePlaqueImage
+        getLivePlaqueImage,
+        scanTicketOffline,
+        scanTicketOnline
     }
 
 }

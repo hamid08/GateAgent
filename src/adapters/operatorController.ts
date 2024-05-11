@@ -66,18 +66,68 @@ export default function operatorController() {
 
             const { gateId } = req.params;
 
-            res.status(200).send(successResult('', await operatorService().connectionTest(gateId,type)));
+            res.status(200).send(successResult('', await operatorService().connectionTest(gateId, type)));
         } catch (error: any) {
             console.error(error);
             res.status(200).send(faildResult(error.message));
         }
     }
 
+
+    const scanTicketOffline = async (req: any, res: any, next: any) => {
+        try {
+            if (!req.params.hasOwnProperty('gateId')) {
+                throw new Error('شناسه گیت الزامی می باشد');
+            }
+
+            if (!req.body.hasOwnProperty('tripNumber')) {
+                throw new Error('شماره سفر الزامی می باشد');
+            }
+
+            const { tripNumber } = req.body;
+
+            const { gateId } = req.params;
+
+
+            res.status(200).send(successResult('', await operatorService().scanTicketOffline(gateId, tripNumber)));
+
+        } catch (error: any) {
+            console.error(error);
+            res.status(200).send(faildResult(error.message));
+        }
+    };
+
+    const scanTicketOnline = async (req: any, res: any, next: any) => {
+        try {
+            if (!req.params.hasOwnProperty('gateId')) {
+                throw new Error('شناسه گیت الزامی می باشد');
+            }
+
+            if (!req.body.hasOwnProperty('tripNumber')) {
+                throw new Error('شماره سفر الزامی می باشد');
+            }
+
+            const { tripNumber } = req.body;
+
+            const { gateId } = req.params;
+
+
+            res.status(200).send(successResult('', await operatorService().scanTicketOnline(gateId, tripNumber)));
+
+        } catch (error: any) {
+            console.error(error);
+            res.status(200).send(faildResult(error.message));
+        }
+    };
+
+
     return {
         getGates,
         getGateDetailsById,
         connectionTest,
-        getLivePlaqueImage
+        getLivePlaqueImage,
+        scanTicketOffline,
+        scanTicketOnline
     }
 
 }
