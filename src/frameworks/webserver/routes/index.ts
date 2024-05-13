@@ -27,7 +27,7 @@ export default async function routes(app: Express) {
    *       200:
    *         description: API is running
    */
-  app.get('/healthcheck', (req, res) => res.sendStatus(200))
+  app.get('/healthcheck', (req, res) => res.status(200).send(successResult()));
 
 
   /**

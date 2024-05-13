@@ -15,6 +15,9 @@ interface IIdentificationProcess {
     endProcessTime: Date,
     status: IdentificationProcessStatus, // وضعیت
     finishedProcess: boolean,
+    name: string, // شناسه / نام
+
+
     trafficType: IdentificationProcessTrafficType, // نوع تردد
     permissionTrafficGroupId?: string, // شناسه کنترل ترددی
     vehicleId?: string, // شناسه خودرو
@@ -27,11 +30,9 @@ interface IIdentificationProcess {
     anprData?: string,
     rfidData?: string,
 
-    identity?: string,
-
     plaqueNo?: string,
     plaqueType?: VehiclePlaqueType,
-    vehicleUserType?: string,
+    vehicleType?: string,
 
 
 
@@ -40,16 +41,16 @@ interface IIdentificationProcess {
 
 
 const identificationProcessSchema = new Schema<IIdentificationProcess>({
-    driverId: { type: String, required: false },
-    vehicleId: { type: String, required: false },
-    permissionTrafficGroupId: { type: String, required: false },
-
     gateId: { type: String, required: true, index: true },
     startProcessTime: Date,
     endProcessTime: Date,
-    finishedProcess: Boolean,
     status: { type: Number, enum: IdentificationProcessStatus },
+    finishedProcess: Boolean,
+    name: { type: String, required: false },
     trafficType: { type: Number, enum: IdentificationProcessTrafficType },
+    permissionTrafficGroupId: { type: String, required: false },
+    vehicleId: { type: String, required: false },
+    driverId: { type: String, required: false },
 
     hf: { type: Boolean, default: false },
     anpr: { type: Boolean, default: false },
@@ -59,11 +60,10 @@ const identificationProcessSchema = new Schema<IIdentificationProcess>({
     anprData: { type: String, required: false },
     rfidData: { type: String, required: false },
 
-    identity: { type: String, required: false },
 
     plaqueNo: { type: String, required: false },
     plaqueType: { type: Number, enum: VehiclePlaqueType, required: false },
-    vehicleUserType: { type: String, required: false },
+    vehicleType: { type: String, required: false },
 
 });
 

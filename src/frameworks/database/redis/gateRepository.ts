@@ -28,30 +28,6 @@ export default function gateRepository() {
   }
 
 
-  async function setRFID(tagData: TagDataModel): Promise<void> {
-    try {
-      await redisClient.hSet('RFID', 'data', JSON.stringify(tagData));
-      var dateFormat = moment().format('YYYY-MM-DD HH:mm:ss');
-      console.info(`RFIDTag in Redis Updated! ${dateFormat}`);
-    } catch (error) {
-      console.error(`Error updating RFID data: ${error}`);
-    }
-  }
-
-  async function getRFID(): Promise<TagDataModel | null> {
-    try {
-      const value = await redisClient.get('RFID');
-      const data: TagDataModel = JSON.parse(value);
-      // console.log(`RFID data: ${JSON.stringify(data)}`);
-      return data;
-    } catch (error) {
-      console.error(`Error getting RFID data: ${error}`);
-      return null;
-    }
-  }
-
-
-
   async function setVehicles(vehicles: VehicleModel[]) {
     try {
       vehicles.forEach(async (vehicle) => {
@@ -101,7 +77,6 @@ export default function gateRepository() {
   return {
     setVehicles,
     testRedisConnection,
-    setRFID,
 
   }
 }

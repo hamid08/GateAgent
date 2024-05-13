@@ -17,7 +17,11 @@ import {
     HumanDetectTools,
     SyncDataType, VehicleDetectTools,
     IdentifierConnectionStatus,
-    GateIdentificationType
+    GateIdentificationType,
+    OfflineTrafficsType,
+    VehiclePlaqueType,
+    IdentificationProcessStatus,
+    IdentificationProcessTrafficType
 
 } from '../../../../application/enums/gateEnum';
 import { AnprCamera, RfidAntenna } from "../../../../application/models/smartGateModels";
@@ -68,7 +72,8 @@ export default function operatorRepository() {
                 var netAccessItems: StatusConnectionCardItems[] = [];
                 netAccessItems.push(new StatusConnectionCardItems('NetAccess', IdentifierConnectionStatus.Disconnect, undefined));
 
-                return new StatusConnectionCard(GateIdentificationType.NetAccess, 10, netAccessItems);
+                return new StatusConnectionCard(GateIdentificationType.NetAccess, IdentifierConnectionStatus.Disconnect,
+                    10, netAccessItems);
 
 
             case GateIdentificationType.RFID:
@@ -79,7 +84,7 @@ export default function operatorRepository() {
                     )
                 );
 
-                return new StatusConnectionCard(GateIdentificationType.RFID, 30, rfidItems);
+                return new StatusConnectionCard(GateIdentificationType.RFID, IdentifierConnectionStatus.Disconnect, 30, rfidItems);
 
             case GateIdentificationType.ANPR:
                 var anprItems: StatusConnectionCardItems[] = [];
@@ -89,12 +94,12 @@ export default function operatorRepository() {
                     )
                 );
 
-                return new StatusConnectionCard(GateIdentificationType.ANPR, 30, anprItems);
+                return new StatusConnectionCard(GateIdentificationType.ANPR, IdentifierConnectionStatus.Disconnect, 30, anprItems);
 
             case GateIdentificationType.Kiosk:
                 var kioskItems: StatusConnectionCardItems[] = [];
                 kioskItems.push(new StatusConnectionCardItems('Kiosk', IdentifierConnectionStatus.Disconnect, undefined));
-                return new StatusConnectionCard(GateIdentificationType.Kiosk, 30, kioskItems);
+                return new StatusConnectionCard(GateIdentificationType.Kiosk, IdentifierConnectionStatus.Disconnect, 30, kioskItems);
 
 
             default: return null;
@@ -119,7 +124,7 @@ export default function operatorRepository() {
         var netAccessItems: StatusConnectionCardItems[] = [];
         netAccessItems.push(new StatusConnectionCardItems('NetAccess', IdentifierConnectionStatus.Disconnect, undefined));
 
-        statusConnectionCards.push(new StatusConnectionCard(GateIdentificationType.NetAccess, 10, netAccessItems));
+        statusConnectionCards.push(new StatusConnectionCard(GateIdentificationType.NetAccess, IdentifierConnectionStatus.Disconnect, 10, netAccessItems));
 
         //RFID
         var rfidItems: StatusConnectionCardItems[] = [];
@@ -129,7 +134,7 @@ export default function operatorRepository() {
             )
         );
 
-        statusConnectionCards.push(new StatusConnectionCard(GateIdentificationType.RFID, 30, rfidItems));
+        statusConnectionCards.push(new StatusConnectionCard(GateIdentificationType.RFID, IdentifierConnectionStatus.Disconnect, 30, rfidItems));
 
         //ANPR
         var anprItems: StatusConnectionCardItems[] = [];
@@ -139,13 +144,13 @@ export default function operatorRepository() {
             )
         );
 
-        statusConnectionCards.push(new StatusConnectionCard(GateIdentificationType.ANPR, 30, anprItems));
+        statusConnectionCards.push(new StatusConnectionCard(GateIdentificationType.ANPR, IdentifierConnectionStatus.Disconnect, 30, anprItems));
 
 
         //Kiosk
         var kioskItems: StatusConnectionCardItems[] = [];
         kioskItems.push(new StatusConnectionCardItems('Kiosk', IdentifierConnectionStatus.Disconnect, undefined));
-        statusConnectionCards.push(new StatusConnectionCard(GateIdentificationType.Kiosk, 30, kioskItems));
+        statusConnectionCards.push(new StatusConnectionCard(GateIdentificationType.Kiosk, IdentifierConnectionStatus.Disconnect, 30, kioskItems));
 
 
         var taxiOperation = document.taxiWorkModeInfo.taxiOperation;
@@ -227,6 +232,22 @@ export default function operatorRepository() {
 
         var data: IdentificationProcessGridModel[] = [];
 
+        for (var i = 0; i < 45; i++) {
+
+            data.push(new IdentificationProcessGridModel(
+                new Date(),
+                'ماشین وزیر راه'+i,
+                IdentificationProcessStatus.Successful,
+                '45-الف-586-22',
+                VehiclePlaqueType.Personal,
+                true,
+                true,
+                'علی حیدری'+i,
+                'سواری پلاس',
+                IdentificationProcessTrafficType.TrafficControl
+
+            ));
+        }
 
         var total: number = 0;
 
@@ -297,6 +318,23 @@ export default function operatorRepository() {
 
         var data: OfflineTrafficsGridModel[] = [];
 
+        for (var i = 0; i < 45; i++) {
+
+            data.push(new OfflineTrafficsGridModel(
+                new Date(),
+                'DSS54' + i,
+                OfflineTrafficsType.Successful,
+                'T1-030228-0132',
+                '45-الف-586-22',
+                VehiclePlaqueType.Personal,
+                true,
+                true,
+                `علی حیدری ${i}`,
+                'سواری پلاس'
+
+            ));
+        }
+
 
         var total: number = 0;
 
@@ -310,7 +348,7 @@ export default function operatorRepository() {
 
 
     }
-    
+
 
     return {
         getGates,

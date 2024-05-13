@@ -10,7 +10,14 @@ export default function socketTestController() {
 
     const anprTest = async (req: any, res: any, next: any) => {
         try {
-           await socketTestService().anprTest();
+
+            if (!req.query.hasOwnProperty('found')) {
+                throw new Error('found الزامی می باشد');
+            }
+
+            const found = req.query.found == 'false'? false:true;
+
+            await socketTestService().anprTest(found);
 
             res.status(200).send(successResult());
 
@@ -20,33 +27,22 @@ export default function socketTestController() {
         }
     };
 
-    const identityResultBox_info = async (req: any, res: any, next: any) => {
+    const identityResultBox = async (req: any, res: any, next: any) => {
         try {
-           await socketTestService().identityResultBox_info();
 
-            res.status(200).send(successResult());
+            if (!req.query.hasOwnProperty('type')) {
+                throw new Error('نوع الزامی می باشد');
+            }
 
-        } catch (error: any) {
-            console.error(error);
-            res.status(200).send(faildResult(error.message));
-        }
-    };
+            if (!req.query.hasOwnProperty('messageType')) {
+                throw new Error('وضعیت اتصال الزامی می باشد');
+            }
 
-    const identityResultBox_Error = async (req: any, res: any, next: any) => {
-        try {
-           await socketTestService().identityResultBox_Error();
+            const type = Number(req.query.type);
+            const messageType = Number(req.query.messageType);
 
-            res.status(200).send(successResult());
 
-        } catch (error: any) {
-            console.error(error);
-            res.status(200).send(faildResult(error.message));
-        }
-    };
-
-    const identityResultBox_Success = async (req: any, res: any, next: any) => {
-        try {
-           await socketTestService().identityResultBox_Success();
+            await socketTestService().identityResultBox(type, messageType);
 
             res.status(200).send(successResult());
 
@@ -58,7 +54,14 @@ export default function socketTestController() {
 
     const hfData = async (req: any, res: any, next: any) => {
         try {
-           await socketTestService().hfData();
+            if (!req.query.hasOwnProperty('found')) {
+                throw new Error('found الزامی می باشد');
+            }
+
+            const found = req.query.found == 'false'? false:true;
+
+
+            await socketTestService().hfData(found);
 
             res.status(200).send(successResult());
 
@@ -70,7 +73,15 @@ export default function socketTestController() {
 
     const rfidData = async (req: any, res: any, next: any) => {
         try {
-           await socketTestService().rfidData();
+
+            if (!req.query.hasOwnProperty('found')) {
+                throw new Error('found الزامی می باشد');
+            }
+
+            const found = req.query.found == 'false'? false:true;
+
+
+            await socketTestService().rfidData(found);
 
             res.status(200).send(successResult());
 
@@ -83,7 +94,33 @@ export default function socketTestController() {
 
     const scanTicketModal = async (req: any, res: any, next: any) => {
         try {
-           await socketTestService().scanTicketModal();
+            await socketTestService().scanTicketModal();
+
+            res.status(200).send(successResult());
+
+        } catch (error: any) {
+            console.error(error);
+            res.status(200).send(faildResult(error.message));
+        }
+    };
+
+    const identificationStatus = async (req: any, res: any, next: any) => {
+        try {
+
+
+            if (!req.query.hasOwnProperty('type')) {
+                throw new Error('نوع الزامی می باشد');
+            }
+
+            if (!req.query.hasOwnProperty('status')) {
+                throw new Error('وضعیت اتصال الزامی می باشد');
+            }
+
+            const type = Number(req.query.type);
+            const status = Number(req.query.status);
+
+
+            await socketTestService().identificationStatus(type, status);
 
             res.status(200).send(successResult());
 
@@ -96,14 +133,15 @@ export default function socketTestController() {
 
 
 
+
     return {
         anprTest,
         hfData,
         rfidData,
         scanTicketModal,
-        identityResultBox_info,
-        identityResultBox_Error,
-        identityResultBox_Success
+        identityResultBox,
+        identificationStatus,
+
 
     }
 

@@ -234,3 +234,16 @@ export enum GateIdentificationType {
     Kiosk = 3,
     NetAccess = 4,
 }
+
+
+export enum OfflineTrafficsType {
+    //موفق
+    Successful = 1,
+
+    //ناموفق
+    UnSuccessful = 2,
+
+    //در صف ارسال
+    InQueue = 3,
+}
+

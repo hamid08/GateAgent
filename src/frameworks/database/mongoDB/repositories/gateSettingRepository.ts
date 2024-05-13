@@ -204,6 +204,8 @@ export default function gateSettingRepository() {
         return normalizeUrl(document.gateServiceAddress);
     }
 
+    
+
 
     return {
         upsertGateServiceAddress,

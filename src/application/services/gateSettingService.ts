@@ -400,7 +400,6 @@ export default function gateService() {
 
         return gateServices;
 
-
     }
 
 

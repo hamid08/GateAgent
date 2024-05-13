@@ -7,7 +7,8 @@ import {
     IdentityMessageType,
     IdentificationProcessStatus,
     IdentificationProcessTrafficType,
-    VehiclePlaqueType
+    VehiclePlaqueType,
+    OfflineTrafficsType
 
 } from '../enums/gateEnum';
 
@@ -48,13 +49,15 @@ export class IdentificationProcessGridFilterModel extends BaseGridFilterModel {
 export class IdentificationProcessGridModel {
 
     constructor(
-        dateTime: Date,
-        name: string,
-        status: IdentificationProcessStatus,
+        dateTime: Date, // زمان تردد
+        name: string, // شناسه / نام
+        status: IdentificationProcessStatus, // وضعیت
         plaqueNo: string,
         plaqueType: VehiclePlaqueType,
+        hf: boolean,
+        rfid: boolean,
         driverFullName: string,
-        vehicleUserType: string,
+        vehicleType: string,
         trafficType: IdentificationProcessTrafficType,
 
     ) {
@@ -65,8 +68,10 @@ export class IdentificationProcessGridModel {
         this.plaqueType = plaqueType;
         this.status = status;
         this.driverFullName = driverFullName;
-        this.vehicleUserType = vehicleUserType;
+        this.vehicleType = vehicleType;
         this.trafficType = trafficType;
+        this.hf = hf;
+        this.rfid = rfid;
 
     }
 
@@ -76,8 +81,10 @@ export class IdentificationProcessGridModel {
     plaqueNo: string;
     plaqueType: VehiclePlaqueType;
     driverFullName: string;
-    vehicleUserType: string;
+    vehicleType: string;
     trafficType: IdentificationProcessTrafficType;
+    hf: boolean;
+    rfid: boolean;
 
 }
 
@@ -112,31 +119,41 @@ export class OfflineTrafficsGridFilterModel extends BaseGridFilterModel {
 export class OfflineTrafficsGridModel {
 
     constructor(
-        plaqueNo: string,
+        dateTime: Date, // زمان تردد
+        vehicleIdentity: string, // شناسه خودرو
+        status: OfflineTrafficsType, // وضعیت 
+        tripNumber: string, // شماره سفر
+        plaqueNo: string, // شماره پلاک
         plaqueType: VehiclePlaqueType,
-        vehicleIdentity: string,
+        hf: boolean,
+        rfid: boolean,
         driverFullName: string,
-        dateTime: Date,
-        tripNumber: string,
-
+        vehicleType: string
     ) {
 
         this.dateTime = dateTime;
         this.tripNumber = tripNumber;
-        this.plaqueNo = plaqueNo;
         this.vehicleIdentity = vehicleIdentity;
+        this.status = status;
+        this.plaqueNo = plaqueNo;
         this.plaqueType = plaqueType;
         this.driverFullName = driverFullName;
+        this.hf = hf;
+        this.rfid = rfid;
+        this.vehicleType = vehicleType;
 
     }
 
-    dateTime: Date;
-    vehicleIdentity: string;
-
-    tripNumber: string;
-    plaqueNo: string;
+    dateTime: Date; // زمان تردد
+    vehicleIdentity: string; // شناسه خودرو
+    status: OfflineTrafficsType; // وضعیت 
+    tripNumber: string; // شماره سفر
+    plaqueNo: string; // شماره پلاک
     plaqueType: VehiclePlaqueType;
+    hf: boolean;
+    rfid: boolean;
     driverFullName: string;
+    vehicleType: string
 
 }
 
@@ -280,18 +297,21 @@ export class StatusConnectionCard {
 
     constructor(
         type: GateIdentificationType,
+        status: IdentifierConnectionStatus,
         intervalTime: number,
         items: StatusConnectionCardItems[],
 
 
     ) {
         this.type = type;
+        this.status = status;
         this.intervalTime = intervalTime;
         this.items = items;
 
     }
 
     type: GateIdentificationType;
+    status: IdentifierConnectionStatus;
     intervalTime: number;
     items: StatusConnectionCardItems[];
 

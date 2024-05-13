@@ -10,6 +10,13 @@ export default async function routes(app: Express) {
    *     tags:
    *     - Socket Test
    *     summary: Test ANPR Socket
+   *     parameters:
+   *      - name: found
+   *        in: query
+   *        description: 
+   *        required: true
+   *        schema:
+   *          type: boolean
    *     security:
    *       - bearerAuth: []
    *     responses:
@@ -34,11 +41,26 @@ export default async function routes(app: Express) {
 
     /** GET Methods
 * @openapi
-* '/api/socketTest/identityResultBox_info':
+* '/api/socketTest/identityResultBox':
 *  get:
 *     tags:
 *     - Socket Test
-*     summary: Test identityResultBox_info
+*     summary: Test identityResultBox
+*     parameters:
+*      - name: type
+*        in: query
+*        description: 
+*        required: true
+*        schema:
+*          type: integer
+*          default: 1
+*      - name: messageType
+*        in: query
+*        description: 
+*        required: true
+*        schema:
+*          type: integer
+*          default: 1
 *     security:
 *       - bearerAuth: []
 *     responses:
@@ -58,152 +80,145 @@ export default async function routes(app: Express) {
 *           bearerFormat: JWT
 */
 
-    app.get('/api/socketTest/identityResultBox_info', socketTestController().identityResultBox_info);
+    app.get('/api/socketTest/identityResultBox', socketTestController().identityResultBox);
+
 
 
     /** GET Methods
-* @openapi
-* '/api/socketTest/identityResultBox_Error':
-*  get:
-*     tags:
-*     - Socket Test
-*     summary: Test identityResultBox_Error
-*     security:
-*       - bearerAuth: []
-*     responses:
-*      200:
-*        description: Fetched successfully
-*      400:
-*        description: Bad Request
-*      404:
-*        description: Not Found 
-*      500:
-*        description: Server Error
-*     components:
-*       securitySchemes:
-*         bearerAuth:
-*           type: http
-*           scheme: bearer
-*           bearerFormat: JWT
-*/
+    * @openapi
+    * '/api/socketTest/hfData':
+    *  get:
+    *     tags:
+    *     - Socket Test
+    *     summary: Test hfData
+    *     parameters:
+    *      - name: found
+    *        in: query
+    *        description: 
+    *        required: true
+    *        schema:
+    *          type: boolean
+    *     security:
+    *       - bearerAuth: []
+    *     responses:
+    *      200:
+    *        description: Fetched successfully
+    *      400:
+    *        description: Bad Request
+    *      404:
+    *        description: Not Found 
+    *      500:
+    *        description: Server Error
+    *     components:
+    *       securitySchemes:
+    *         bearerAuth:
+    *           type: http
+    *           scheme: bearer
+    *           bearerFormat: JWT
+    */
 
-    app.get('/api/socketTest/identityResultBox_Error', socketTestController().identityResultBox_Error);
+    app.get('/api/socketTest/hfData', socketTestController().hfData);
 
 
     /** GET Methods
-* @openapi
-* '/api/socketTest/identityResultBox_Success':
-*  get:
-*     tags:
-*     - Socket Test
-*     summary: Test identityResultBox_Success
-*     security:
-*       - bearerAuth: []
-*     responses:
-*      200:
-*        description: Fetched successfully
-*      400:
-*        description: Bad Request
-*      404:
-*        description: Not Found 
-*      500:
-*        description: Server Error
-*     components:
-*       securitySchemes:
-*         bearerAuth:
-*           type: http
-*           scheme: bearer
-*           bearerFormat: JWT
-*/
+    * @openapi
+    * '/api/socketTest/rfidData':
+    *  get:
+    *     tags:
+    *     - Socket Test
+    *     summary: Test rfidData
+    *     parameters:
+    *      - name: found
+    *        in: query
+    *        description: 
+    *        required: true
+    *        schema:
+    *          type: boolean
+    *     security:
+    *       - bearerAuth: []
+    *     responses:
+    *      200:
+    *        description: Fetched successfully
+    *      400:
+    *        description: Bad Request
+    *      404:
+    *        description: Not Found 
+    *      500:
+    *        description: Server Error
+    *     components:
+    *       securitySchemes:
+    *         bearerAuth:
+    *           type: http
+    *           scheme: bearer
+    *           bearerFormat: JWT
+    */
 
-    app.get('/api/socketTest/identityResultBox_Success', socketTestController().identityResultBox_Success);
-
-
-
-/** GET Methods
-* @openapi
-* '/api/socketTest/hfData':
-*  get:
-*     tags:
-*     - Socket Test
-*     summary: Test hfData
-*     security:
-*       - bearerAuth: []
-*     responses:
-*      200:
-*        description: Fetched successfully
-*      400:
-*        description: Bad Request
-*      404:
-*        description: Not Found 
-*      500:
-*        description: Server Error
-*     components:
-*       securitySchemes:
-*         bearerAuth:
-*           type: http
-*           scheme: bearer
-*           bearerFormat: JWT
-*/
-
-app.get('/api/socketTest/hfData', socketTestController().hfData);
+    app.get('/api/socketTest/rfidData', socketTestController().rfidData);
 
 
-/** GET Methods
-* @openapi
-* '/api/socketTest/rfidData':
-*  get:
-*     tags:
-*     - Socket Test
-*     summary: Test rfidData
-*     security:
-*       - bearerAuth: []
-*     responses:
-*      200:
-*        description: Fetched successfully
-*      400:
-*        description: Bad Request
-*      404:
-*        description: Not Found 
-*      500:
-*        description: Server Error
-*     components:
-*       securitySchemes:
-*         bearerAuth:
-*           type: http
-*           scheme: bearer
-*           bearerFormat: JWT
-*/
+    /** GET Methods
+    * @openapi
+    * '/api/socketTest/scanTicketModal':
+    *  get:
+    *     tags:
+    *     - Socket Test
+    *     summary: Test scanTicketModal
+    *     security:
+    *       - bearerAuth: []
+    *     responses:
+    *      200:
+    *        description: Fetched successfully
+    *      400:
+    *        description: Bad Request
+    *      404:
+    *        description: Not Found 
+    *      500:
+    *        description: Server Error
+    *     components:
+    *       securitySchemes:
+    *         bearerAuth:
+    *           type: http
+    *           scheme: bearer
+    *           bearerFormat: JWT
+    */
 
-app.get('/api/socketTest/rfidData', socketTestController().rfidData);
+    app.get('/api/socketTest/scanTicketModal', socketTestController().scanTicketModal);
 
 
-/** GET Methods
-* @openapi
-* '/api/socketTest/scanTicketModal':
-*  get:
-*     tags:
-*     - Socket Test
-*     summary: Test scanTicketModal
-*     security:
-*       - bearerAuth: []
-*     responses:
-*      200:
-*        description: Fetched successfully
-*      400:
-*        description: Bad Request
-*      404:
-*        description: Not Found 
-*      500:
-*        description: Server Error
-*     components:
-*       securitySchemes:
-*         bearerAuth:
-*           type: http
-*           scheme: bearer
-*           bearerFormat: JWT
-*/
+    /** GET Methods
+           * @openapi
+           * '/api/socketTest/identificationStatus':
+           *  get:
+           *     tags:
+           *     - Socket Test
+           *     summary: Test identificationStatus
+           *     parameters:
+           *      - name: type
+           *        in: query
+           *        description: 
+           *        required: true
+           *        schema:
+           *          type: integer
+           *          default: 1
+           *      - name: status
+           *        in: query
+           *        description: 
+           *        required: true
+           *        schema:
+           *          type: integer
+           *          default: 1
+           *     responses:
+           *      200:
+           *        description: Fetched successfully
+           *      400:
+           *        description: Bad Request
+           *      404:
+           *        description: Not Found
+           *      500:
+           *        description: Server Error
+           */
 
-app.get('/api/socketTest/scanTicketModal', socketTestController().scanTicketModal);
+
+    app.get('/api/socketTest/identificationStatus', socketTestController().identificationStatus);
 
 }

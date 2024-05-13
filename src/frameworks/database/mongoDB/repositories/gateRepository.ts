@@ -158,10 +158,21 @@ export default function gateRepositoryMongoDB() {
   }
 
 
-  async function findVehicleByTag(tag: string): Promise<VehicleModel | null> {
+  async function findInTaxiListByCardNo(cardNo: string): Promise<VehicleModel | null> {
+    return await Vehicle.findOne({ rfidTag: cardNo }); //TODO Change to CardNo
+  }
+
+  async function findInTaxiListByTag(tag: string): Promise<VehicleModel | null> {
     return await Vehicle.findOne({ rfidTag: tag });
   }
 
+  async function findInTrafficControlListByTag(tag: string): Promise<TrafficGroupModel | null> {
+    return await TrafficGroup.findOne({ rfidTag: tag });
+  }
+
+  async function findInTrafficControlListByCardNo(cardNo: string): Promise<TrafficGroupModel | null> {
+    return await TrafficGroup.findOne({ cardNumber: cardNo });
+  }
 
 
   async function findVehicleByPlate(plate: string): Promise<VehicleModel | null> {
@@ -323,7 +334,7 @@ export default function gateRepositoryMongoDB() {
     addRangeSmartGate,
     gateCameras,
     gateRfidAntennas,
-    findVehicleByTag,
+    findInTaxiListByTag,
     findVehicleByPlate,
 
     removeSmartGateByIdentity,
@@ -338,7 +349,12 @@ export default function gateRepositoryMongoDB() {
 
     addRangeSmartGateUsers,
 
-    getSmartGateProccessInfoById
+    getSmartGateProccessInfoById,
+    findInTrafficControlListByTag,
+
+    findInTrafficControlListByCardNo,
+    findInTaxiListByCardNo
+
   };
 }
 

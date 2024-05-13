@@ -18,6 +18,7 @@ import {
 import { getConnectedSocket } from '../../frameworks/services/socket/connection';
 import { GridResultModel } from '../models/baseModels';
 
+import gateSettingService from "./gateSettingService";
 
 import {
     GateIdentificationType,
@@ -109,6 +110,41 @@ export default function gateService() {
 
         //Items Status
         data?.statusConnectionCard.forEach(async c => {
+
+            switch (c.type) {
+                case GateIdentificationType.NetAccess:
+
+                    var gateServiceAddress = await gateSettingService().getGateServiceAddress();
+                    if (gateServiceAddress && gateServiceAddress != '') {
+
+                        c.status = await gateSettingService().testGateServiceAddress(gateServiceAddress) ? IdentifierConnectionStatus.Connect : IdentifierConnectionStatus.Disconnect;
+                    }
+
+                    break;
+
+                case GateIdentificationType.ANPR:
+
+                    if (anprSocketInfo) {
+                        c.status = IdentifierConnectionStatus.Connect;
+                    }
+
+                    break;
+
+                case GateIdentificationType.RFID:
+
+                    if (rfidSocketInfo) {
+                        c.status = IdentifierConnectionStatus.Connect;
+                    }
+
+                    break;
+
+                case GateIdentificationType.Kiosk:
+                    c.status = IdentifierConnectionStatus.Connect;
+                    break;
+
+            }
+
+
             c.items.forEach(async x => {
                 x.status = IdentifierConnectionStatus.Connect;
             })
@@ -125,6 +161,50 @@ export default function gateService() {
 
 
         var data = await operatorRepository().getStatusConnectionItemsByType(gateId, type);
+
+        if (data == null) {
+            return null;
+        }
+
+        var sockets = await getConnectedSocket();
+
+
+        switch (type) {
+            case GateIdentificationType.NetAccess:
+
+                var gateServiceAddress = await gateSettingService().getGateServiceAddress();
+                if (gateServiceAddress && gateServiceAddress != '') {
+
+                    data.status = await gateSettingService().testGateServiceAddress(gateServiceAddress) ? IdentifierConnectionStatus.Connect : IdentifierConnectionStatus.Disconnect;
+                }
+
+                break;
+
+            case GateIdentificationType.ANPR:
+
+                //ANPR Status
+                var anprSocketInfo = sockets?.find(x => x.type == GateServicesType.ANPRListener);
+                if (anprSocketInfo) {
+                    data.status = IdentifierConnectionStatus.Connect;
+                }
+
+                break;
+
+            case GateIdentificationType.RFID:
+
+                //RFID Status
+                var rfidSocketInfo = sockets?.find(x => x.type == GateServicesType.RFIDListener);
+                if (rfidSocketInfo) {
+                    data.status = IdentifierConnectionStatus.Connect;
+                }
+
+                break;
+
+            case GateIdentificationType.Kiosk:
+                data.status = IdentifierConnectionStatus.Connect;
+                break;
+
+        }
 
 
         data?.items.forEach(async c => {

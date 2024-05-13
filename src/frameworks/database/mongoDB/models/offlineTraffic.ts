@@ -1,34 +1,53 @@
 import { Schema, model } from 'mongoose';
 
 import {
-    TaxiWorkModeOperation
+    TaxiWorkModeOperation,
+    OfflineTrafficsType,
+    VehiclePlaqueType
+
 }
     from '../../../../application/enums/gateEnum';
 
 
 
 interface IOfflineTraffic {
-    gateId: string,
     registerDate: Date,
+    vehicleIdentity?: string,
+    status: OfflineTrafficsType,
+    tripNumber?: string,
+    plaqueNo?: string,
+    plaqueType?: VehiclePlaqueType,
+    hf: boolean,
+    rfid: boolean,
+    anpr: boolean,
+    gateId: string,
+    driverFullName: string,
     taxiOperation: TaxiWorkModeOperation
     vehicleId?: string,
     driverId?: string,
-    tripNumber?: string,
-    isSent: boolean
+    vehicleType?: string,
+
 }
 
 
 const offlineTrafficSchema = new Schema<IOfflineTraffic>({
-    gateId: { type: String, required: true, index: true },
-    driverId: { type: String, required: false },
-    vehicleId: { type: String, required: false },
-
-    registerDate: Date,
-    taxiOperation: { type: Number, enum: TaxiWorkModeOperation },
+    registerDate: { type: Date, required: true, default: new Date() },
+    vehicleIdentity: { type: String, required: false },
+    status: { type: Number, enum: OfflineTrafficsType },
     tripNumber: { type: String, required: false },
-    isSent: Boolean,
+    plaqueNo: { type: String, required: false },
+    plaqueType: { type: Number, enum: VehiclePlaqueType,required:false },
+    hf:Boolean,
+    rfid:Boolean,
+    anpr:Boolean,
 
+    gateId: { type: String, required: true, index: true },
 
+    driverFullName: { type: String, required: false },
+    taxiOperation: { type: Number, enum: TaxiWorkModeOperation },
+    vehicleId: { type: String, required: false },
+    driverId: { type: String, required: false },
+    vehicleType: { type: String, required: false },
 });
 
 
