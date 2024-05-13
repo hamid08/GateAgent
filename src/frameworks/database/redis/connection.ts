@@ -1,8 +1,8 @@
-import { createClient } from 'redis';
+import { createClient, RedisClientType } from 'redis';
 import config from "../../../config/config";
 
 class RedisDBConnection {
-  connection!: any;
+  connection!: RedisClientType;
   private reconnectInterval: number;
 
   constructor(reconnectInterval: number = 5000) {

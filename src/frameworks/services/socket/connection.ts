@@ -182,7 +182,7 @@ export const initConnection = () => {
         socket.on('RFIDTag', (data: any) => {
             // sendToScreen(data)
             // console.log(JSON.stringify(data));
-            socketService().proccesRFIDTag(data)
+            socketService().proccesRFIDTag(data);
 
         });
 
@@ -190,7 +190,7 @@ export const initConnection = () => {
             // var dateFormat = moment().format('YYYY-MM-DD HH:mm:ss');
             console.log(JSON.stringify(data));
 
-            socketService().proccesRFIDTag(data);
+            socketService().proccesANPRPlate(data);
 
 
         });
@@ -198,9 +198,8 @@ export const initConnection = () => {
 
         socket.on('HFCard', (data: any) => {
             // sendToScreen(data)
-            console.log(JSON.stringify(data));
-          
-
+            // console.log(JSON.stringify(data));
+            socketService().proccesHFCard(data);
         });
 
 

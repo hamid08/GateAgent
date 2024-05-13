@@ -20,7 +20,12 @@ import {
     HFDetectedDataModel,
     HFPureDataModel,
     HFCacheDataModel,
-    HFDataSocketModel
+    HFDataSocketModel,
+
+    ANPRCacheDataModel,
+    ANPRDataSocketModel,
+    ANPRDetectedDataModel,
+    ANPRPureDataModel
 
 
 } from '../models/identificationProcessModels';
@@ -44,16 +49,17 @@ export default function socketService() {
         return await gateSettingRepository().findGateServiceToGateSettingByToken(token);
     }
 
-    const checkIsRunProcess = async function (): Promise<boolean> {
+    const checkIsRunProcessOrTemporaryLockProcess = async function (gateId:string): Promise<boolean> {
 
-        return await identificationProcessService().isRunProcess();
+        return await identificationProcessService().isRunProcess() || await _redisRepository.existTemporaryLockProcess(gateId);
     }
 
     const proccesRFIDTag = async function (tagData: TagDataModel) {
 
-        if (await checkIsRunProcess()) return;
-
         var gateId = tagData.GateId;
+
+        if (await checkIsRunProcessOrTemporaryLockProcess(gateId)) return;
+
 
         //Create Pure Tage Data Model For Redis
         var rfidRedisData: RFIDCacheDataModel = new RFIDCacheDataModel(
@@ -231,7 +237,7 @@ export default function socketService() {
 
             }
 
-            else { // Found In Taxi List
+            else { //  Found In TrafficControl List
 
 
                 rfidRedisData.detected = true;
@@ -266,237 +272,428 @@ export default function socketService() {
     }
 
 
-    // const proccesHFCard = async function (cardData: HFDataModel) {
+    const proccesHFCard = async function (cardData: HFDataModel) {
 
-    //     if (await checkIsRunProcess()) return;
+        var gateId = cardData.gateId;
 
-    //     var gateId = cardData.gateId;
+        if (await checkIsRunProcessOrTemporaryLockProcess(gateId)) return;
 
-    //     //Create Pure Tage Data Model For Redis
-    //     var hfRedisData: HFCacheDataModel = new HFCacheDataModel(
-    //         new HFPureDataModel(cardData.cardNo, gateId, cardData.dateTime),
-    //         false,
-    //         undefined
+        //Create Pure Tage Data Model For Redis
+        var hfRedisData: HFCacheDataModel = new HFCacheDataModel(
+            new HFPureDataModel(cardData.cardNo, gateId, cardData.dateTime),
+            false,
+            undefined
 
-    //     );
+        );
 
 
-    //     // Check For Detect Target By This Data
+        // Check For Detect Target By This Data
 
-    //     // Get Gate Setting
-    //     var gateSetting = await _mongoRepository.getSmartGateProccessInfoById(gateId);
+        // Get Gate Setting
+        var gateSetting = await _mongoRepository.getSmartGateProccessInfoById(gateId);
 
-    //     if (!gateSetting && gateSetting == null) {
-    //         console.warn(`In ProcessHFCard Stop Process Because Not Found GateSetting!`);
-    //         return;
-    //     }
+        if (!gateSetting && gateSetting == null) {
+            console.warn(`In ProcessHFCard Stop Process Because Not Found GateSetting!`);
+            return;
+        }
 
 
-    //     // Find Priority For Search
-    //     if (gateSetting.taxiWorkMode && gateSetting.taxiWorkModeInfo && gateSetting.taxiWorkModeInfo.priority == SmartGatePriority.First) {
+        // Find Priority For Search
+        if (gateSetting.taxiWorkMode && gateSetting.taxiWorkModeInfo && gateSetting.taxiWorkModeInfo.priority == SmartGatePriority.First) {
 
-    //         var driver = await _mongoRepository.findInTaxiListByCardNo(cardData.cardNo);
+            var driver = await _mongoRepository.findInTaxiListByCardNo(cardData.cardNo);
 
-    //         if (!driver || driver == null) { // Not Found In Taxi List
+            if (!driver || driver == null) { // Not Found In Taxi List
 
-    //             console.info(`In ProcessHFCard Not Found In Taxi List!`);
+                console.info(`In ProcessHFCard Not Found In Taxi List!`);
 
 
-    //             if (gateSetting.trafficControlWorkMode) {
-    //                 var permissionTrafficGroup = await _mongoRepository.findInTrafficControlListByCardNo(cardData.cardNo);
+                if (gateSetting.trafficControlWorkMode) {
+                    var permissionTrafficGroup = await _mongoRepository.findInTrafficControlListByCardNo(cardData.cardNo);
 
-    //                 if (!permissionTrafficGroup || permissionTrafficGroup == null) { // Not Found In TrafficControl List
+                    if (!permissionTrafficGroup || permissionTrafficGroup == null) { // Not Found In TrafficControl List
 
-    //                     await io.to(gateId).emit("HFData", new HFDataSocketModel(gateId, false));
-    //                     console.info(`In ProcessHFCard Not Found In TrafficControl List & Taxi List!`);
-    //                     await _redisRepository.setHF(hfRedisData);
+                        await io.to(gateId).emit("HFData", new HFDataSocketModel(gateId, false));
+                        console.info(`In ProcessHFCard Not Found In TrafficControl List & Taxi List!`);
+                        await _redisRepository.setHF(hfRedisData);
 
-    //                 }
-    //                 else { // Found In TrafficControl List
+                    }
+                    else { // Found In TrafficControl List
 
-    //                     hfRedisData.detected = true;
-    //                     hfRedisData.detectedData = new HFDetectedDataModel(
-    //                         IdentificationProcessTrafficType.TrafficControl,
-    //                         permissionTrafficGroup.id,
-    //                         permissionTrafficGroup.name
-    //                     );
+                        hfRedisData.detected = true;
+                        hfRedisData.detectedData = new HFDetectedDataModel(
+                            IdentificationProcessTrafficType.TrafficControl,
+                            permissionTrafficGroup.id,
+                            permissionTrafficGroup.name
+                        );
 
 
-    //                     await _redisRepository.setHF(hfRedisData);
+                        await _redisRepository.setHF(hfRedisData);
 
-    //                     await io.to(gateId).emit("HFData", new RFIDDataSocketModel(
-    //                         gateId,
-    //                         true,
-    //                         permissionTrafficGroup.name,
-    //                         '',
-    //                         permissionTrafficGroup.plaqueNo,
-    //                         permissionTrafficGroup.plaqueType,
+                        await io.to(gateId).emit("HFData", new HFDataSocketModel(
+                            gateId,
+                            true,
+                            permissionTrafficGroup.name,
+                        ));
 
-    //                     ));
+                        console.info(`In ProcessHFCard Found In TrafficControl List!`);
+                    }
+                }
+                else {
+                    await io.to(gateId).emit("HFData", new HFDataSocketModel(gateId, false));
+                    console.info(`In ProcessHFCard Not Found In TrafficControl List & Taxi List!`);
+                    await _redisRepository.setHF(hfRedisData);
 
-    //                     console.info(`In ProcessRFIDTag Found In TrafficControl List!`);
+                }
 
 
+            }
 
-    //                 }
-    //             }
-    //             else {
-    //                 await io.to(gateId).emit("RFIDData", new RFIDDataSocketModel(gateId, false));
-    //                 console.info(`In ProcessRFIDTag Not Found In TrafficControl List & Taxi List!`);
-    //                 await _redisRepository.setRFID(rfidRedisData);
+            else { // Found In Taxi List
 
-    //             }
+                hfRedisData.detected = true;
+                hfRedisData.detectedData = new HFDetectedDataModel(
+                    IdentificationProcessTrafficType.Taxi,
+                    '', // permissionTrafficGroupId By This Type Default Is Empty
+                    '', // Name BY This Type Default Is Empty
+                    '1', //TODO Set DriverId
+                    '', // TODO Set NationalNo
+                    'محمد رضا احدی',
+                    '', // TODO Set Driver Avatar
 
+                );
 
-    //         }
+                await _redisRepository.setHF(hfRedisData);
 
-    //         else { // Found In Taxi List
+                await io.to(gateId).emit("HFData", new HFDataSocketModel(
+                    gateId,
+                    true,
+                    'محمد رضا احدی',
+                    '', // TODO Set Driver Avatar
 
-    //             rfidRedisData.detected = true;
-    //             rfidRedisData.detectedData = new RFIDDetectedDataModel(
-    //                 IdentificationProcessTrafficType.Taxi,
-    //                 vehicle.plaqueNo,
-    //                 vehicle.plaqueType,
-    //                 '',
-    //                 '',
-    //                 vehicle.id,
-    //                 vehicle.identity,
-    //                 vehicle.vehicleUserTypeCaption
-    //             );
+                ));
 
-    //             await _redisRepository.setRFID(rfidRedisData);
+                console.info(`In ProcessHFCard Found In Taxi List!`);
 
-    //             await io.to(gateId).emit("RFIDData", new RFIDDataSocketModel(
-    //                 gateId,
-    //                 true,
-    //                 '',
-    //                 vehicle.identity,
-    //                 vehicle.plaqueNo,
-    //                 vehicle.plaqueType,
 
-    //             ));
 
-    //             console.info(`In ProcessRFIDTag Found In Taxi List!`);
+            }
 
 
+        }
 
-    //         }
+        else if (gateSetting.trafficControlWorkMode && gateSetting.trafficControlWorkModeInfo && gateSetting.trafficControlWorkModeInfo.priority == SmartGatePriority.First) {
 
+            var permissionTrafficGroup = await _mongoRepository.findInTrafficControlListByCardNo(cardData.cardNo);
 
-    //     }
 
-    //     else if (gateSetting.trafficControlWorkMode && gateSetting.trafficControlWorkModeInfo && gateSetting.trafficControlWorkModeInfo.priority == SmartGatePriority.First) {
+            if (!permissionTrafficGroup || permissionTrafficGroup == null) { // Not Found In TrafficControl List
 
-    //         var permissionTrafficGroup = await _mongoRepository.findInTrafficControlListByTag(cardData.Tag);
+                console.info(`In ProcessHFCard Not Found In TrafficControl List!`);
 
+                if (gateSetting.taxiWorkMode) {
 
-    //         if (!permissionTrafficGroup || permissionTrafficGroup == null) { // Not Found In TrafficControl List
+                    var driver = await _mongoRepository.findInTaxiListByCardNo(cardData.cardNo);
 
-    //             console.info(`In ProcessRFIDTag Not Found In TrafficControl List!`);
 
-    //             if (gateSetting.taxiWorkMode) {
-    //                 var vehicle = await _mongoRepository.findInTaxiListByTag(cardData.Tag);
+                    if (!driver || driver == null) { // Not Found In Taxi List
 
+                        await io.to(gateId).emit("HFData", new HFDataSocketModel(gateId, false));
+                        console.info(`In ProcessHFCard Not Found In TrafficControl List & Taxi List!`);
+                        await _redisRepository.setHF(hfRedisData);
 
-    //                 if (!vehicle || vehicle == null) { // Not Found In Taxi List
 
-    //                     await io.to(gateId).emit("RFIDData", new RFIDDataSocketModel(gateId, false));
-    //                     console.info(`In ProcessRFIDTag Not Found In TrafficControl List & Taxi List!`);
-    //                     await _redisRepository.setRFID(rfidRedisData);
+                    }
+                    else { // Found In Taxi List
 
+                        hfRedisData.detected = true;
+                        hfRedisData.detectedData = new HFDetectedDataModel(
+                            IdentificationProcessTrafficType.Taxi,
+                            '', // permissionTrafficGroupId By This Type Default Is Empty
+                            '', // Name BY This Type Default Is Empty
+                            '1', //TODO Set DriverId
+                            '', // TODO Set NationalNo
+                            'محمد رضا احدی',
+                            '', // TODO Set Driver Avatar
 
-    //                 }
-    //                 else { // Found In Taxi List
+                        );
 
-    //                     rfidRedisData.detected = true;
-    //                     rfidRedisData.detectedData = new RFIDDetectedDataModel(
-    //                         IdentificationProcessTrafficType.Taxi,
-    //                         vehicle.plaqueNo,
-    //                         vehicle.plaqueType,
-    //                         '',
-    //                         '',
-    //                         vehicle.id,
-    //                         vehicle.identity,
-    //                         vehicle.vehicleUserTypeCaption
-    //                     );
+                        await _redisRepository.setHF(hfRedisData);
 
-    //                     await _redisRepository.setRFID(rfidRedisData);
+                        await io.to(gateId).emit("HFData", new HFDataSocketModel(
+                            gateId,
+                            true,
+                            'محمد رضا احدی',
+                            '', // TODO Set Driver Avatar
 
-    //                     await io.to(gateId).emit("RFIDData", new RFIDDataSocketModel(
-    //                         gateId,
-    //                         true,
-    //                         '',
-    //                         vehicle.identity,
-    //                         vehicle.plaqueNo,
-    //                         vehicle.plaqueType,
+                        ));
 
-    //                     ));
+                        console.info(`In ProcessHFCard Found In Taxi List!`);
 
-    //                     console.info(`In ProcessRFIDTag Found In Taxi List!`);
+                    }
+                }
+                else {
+                    await io.to(gateId).emit("HFData", new HFDataSocketModel(gateId, false));
+                    console.info(`In ProcessHFCard Not Found In TrafficControl List & Taxi List!`);
+                    await _redisRepository.setHF(hfRedisData);
 
-    //                 }
-    //             }
-    //             else {
-    //                 await io.to(gateId).emit("RFIDData", new RFIDDataSocketModel(gateId, false));
-    //                 console.info(`In ProcessRFIDTag Not Found In TrafficControl List & Taxi List!`);
-    //                 await _redisRepository.setRFID(rfidRedisData);
+                }
 
-    //             }
 
+            }
 
-    //         }
+            else { // Found In TrafficControl List
 
-    //         else { // Found In Taxi List
 
+                hfRedisData.detected = true;
+                hfRedisData.detectedData = new HFDetectedDataModel(
+                    IdentificationProcessTrafficType.TrafficControl,
+                    permissionTrafficGroup.id,
+                    permissionTrafficGroup.name
+                );
 
-    //             rfidRedisData.detected = true;
-    //             rfidRedisData.detectedData = new RFIDDetectedDataModel(
-    //                 IdentificationProcessTrafficType.TrafficControl,
-    //                 permissionTrafficGroup.plaqueNo,
-    //                 permissionTrafficGroup.plaqueType,
-    //                 permissionTrafficGroup.id,
-    //                 permissionTrafficGroup.name
-    //             );
 
-    //             await _redisRepository.setRFID(rfidRedisData);
+                await _redisRepository.setHF(hfRedisData);
 
+                await io.to(gateId).emit("HFData", new HFDataSocketModel(
+                    gateId,
+                    true,
+                    permissionTrafficGroup.name,
+                ));
 
-    //             await io.to(gateId).emit("RFIDData", new RFIDDataSocketModel(
-    //                 gateId,
-    //                 true,
-    //                 permissionTrafficGroup.name,
-    //                 '',
-    //                 permissionTrafficGroup.plaqueNo,
-    //                 permissionTrafficGroup.plaqueType,
+                console.info(`In ProcessHFCard Found In TrafficControl List!`);
 
-    //             ));
+            }
 
-    //             console.info(`In ProcessRFIDTag Found In TrafficControl List!`);
 
-    //         }
+        }
 
-
-    //     }
-
-    // }
+    }
 
 
 
     const proccesANPRPlate = async function (plateData: ANPRDataModel) {
 
-        // Step 1 => Find Vehicle By Vehicle List Or TrafficGroupList
-        var vehicle = await _mongoRepository.findVehicleByPlate(plateData.Plate);
-        if (vehicle == null) {
-            console.log(`Vehicle By Plate:${plateData.Plate} Not Found!`);
+        var gateId = plateData.GateId;
+
+        if (await checkIsRunProcessOrTemporaryLockProcess(gateId)) return;
+
+
+        //Create Pure Tage Data Model For Redis
+        var anprRedisData: ANPRCacheDataModel = new ANPRCacheDataModel(
+            new ANPRPureDataModel(plateData.Plate, plateData.CameraId, gateId, plateData.DateTime),
+            false,
+            undefined
+
+        );
+
+
+        // Check For Detect Target By This Data
+
+        // Get Gate Setting
+        var gateSetting = await _mongoRepository.getSmartGateProccessInfoById(gateId);
+
+        if (!gateSetting && gateSetting == null) {
+            console.warn(`In ProcessANPRPlate Stop Process Because Not Found GateSetting!`);
+            return;
         }
 
-        // await socketConnection().sendToScreen('RFIDTag', vehicle,plateData.GateId);
+
+        // Find Priority For Search
+        if (gateSetting.taxiWorkMode && gateSetting.taxiWorkModeInfo && gateSetting.taxiWorkModeInfo.priority == SmartGatePriority.First) {
+
+            var vehicle = await _mongoRepository.findInTaxiListByPlaqueNo(plateData.Plate);
+
+            if (!vehicle || vehicle == null) { // Not Found In Taxi List
+
+                console.info(`In ProcessANPRPlate Not Found In Taxi List!`);
+
+
+                if (gateSetting.trafficControlWorkMode) {
+                    var permissionTrafficGroup = await _mongoRepository.findInTrafficControlListByPlaqueNo(plateData.Plate);
+
+                    if (!permissionTrafficGroup || permissionTrafficGroup == null) { // Not Found In TrafficControl List
+
+                        await io.to(gateId).emit("ANPRData", new ANPRDataSocketModel(gateId, false, plateData.DateTime, plateData.image));
+                        console.info(`In ProcessANPRPlate Not Found In TrafficControl List & Taxi List!`);
+                        await _redisRepository.setANPR(anprRedisData);
+
+                    }
+                    else { // Found In TrafficControl List
+
+                        anprRedisData.detected = true;
+                        anprRedisData.detectedData = new ANPRDetectedDataModel(
+                            IdentificationProcessTrafficType.TrafficControl,
+                            permissionTrafficGroup.plaqueNo,
+                            permissionTrafficGroup.plaqueType,
+                            permissionTrafficGroup.id,
+                            permissionTrafficGroup.name
+                        );
+
+
+                        await _redisRepository.setANPR(anprRedisData);
+
+                        await io.to(gateId).emit("ANPRData", new ANPRDataSocketModel(
+                            gateId,
+                            true,
+                            plateData.DateTime,
+                            plateData.image,
+                            permissionTrafficGroup.name,
+                            '',
+                            permissionTrafficGroup.plaqueNo,
+                            permissionTrafficGroup.plaqueType,
+
+                        ));
+
+                        console.info(`In ProcessANPRPlate Found In TrafficControl List!`);
 
 
 
-        // Step 2 => Find Gate And Read GateSetting
+                    }
+                }
+                else {
+                    await io.to(gateId).emit("ANPRData", new ANPRDataSocketModel(gateId, false, plateData.DateTime, plateData.image));
+                    console.info(`In ProcessANPRPlate Not Found In TrafficControl List & Taxi List!`);
+                    await _redisRepository.setANPR(anprRedisData);
+
+                }
 
 
+            }
+
+            else { // Found In Taxi List
+
+                anprRedisData.detected = true;
+                anprRedisData.detectedData = new ANPRDetectedDataModel(
+                    IdentificationProcessTrafficType.Taxi,
+                    vehicle.plaqueNo,
+                    vehicle.plaqueType,
+                    '',
+                    '',
+                    vehicle.id,
+                    vehicle.identity,
+                    vehicle.vehicleUserTypeCaption
+                );
+
+                await _redisRepository.setANPR(anprRedisData);
+
+                await io.to(gateId).emit("ANPRData", new ANPRDataSocketModel(
+                    gateId,
+                    true,
+                    plateData.DateTime,
+                    plateData.image,
+                    '',
+                    vehicle.identity,
+                    vehicle.plaqueNo,
+                    vehicle.plaqueType,
+
+                ));
+
+                console.info(`In ProcessANPRPlate Found In Taxi List!`);
+
+
+
+            }
+
+
+        }
+
+        else if (gateSetting.trafficControlWorkMode && gateSetting.trafficControlWorkModeInfo && gateSetting.trafficControlWorkModeInfo.priority == SmartGatePriority.First) {
+
+            var permissionTrafficGroup = await _mongoRepository.findInTrafficControlListByPlaqueNo(plateData.Plate);
+
+
+            if (!permissionTrafficGroup || permissionTrafficGroup == null) { // Not Found In TrafficControl List
+
+                console.info(`In ProcessRFIDTag Not Found In TrafficControl List!`);
+
+                if (gateSetting.taxiWorkMode) {
+                    var vehicle = await _mongoRepository.findInTaxiListByPlaqueNo(plateData.Plate);
+
+
+                    if (!vehicle || vehicle == null) { // Not Found In Taxi List
+
+                        await io.to(gateId).emit("ANPRData", new ANPRDataSocketModel(gateId, false, plateData.DateTime, plateData.image));
+                        console.info(`In ProcessANPRPlate Not Found In TrafficControl List & Taxi List!`);
+                        await _redisRepository.setANPR(anprRedisData);
+
+
+                    }
+                    else { // Found In Taxi List
+
+                        anprRedisData.detected = true;
+                        anprRedisData.detectedData = new ANPRDetectedDataModel(
+                            IdentificationProcessTrafficType.Taxi,
+                            vehicle.plaqueNo,
+                            vehicle.plaqueType,
+                            '',
+                            '',
+                            vehicle.id,
+                            vehicle.identity,
+                            vehicle.vehicleUserTypeCaption
+                        );
+        
+                        await _redisRepository.setANPR(anprRedisData);
+        
+                        await io.to(gateId).emit("ANPRData", new ANPRDataSocketModel(
+                            gateId,
+                            true,
+                            plateData.DateTime,
+                            plateData.image,
+                            '',
+                            vehicle.identity,
+                            vehicle.plaqueNo,
+                            vehicle.plaqueType,
+        
+                        ));
+        
+                        console.info(`In ProcessANPRPlate Found In Taxi List!`);
+
+                    }
+                }
+                else {
+                    await io.to(gateId).emit("ANPRData", new ANPRDataSocketModel(gateId, false, plateData.DateTime, plateData.image));
+                    console.info(`In ProcessANPRPlate Not Found In TrafficControl List & Taxi List!`);
+                    await _redisRepository.setANPR(anprRedisData);
+
+                }
+
+
+            }
+
+            else { //  Found In TrafficControl List
+
+
+                anprRedisData.detected = true;
+                anprRedisData.detectedData = new ANPRDetectedDataModel(
+                    IdentificationProcessTrafficType.TrafficControl,
+                    permissionTrafficGroup.plaqueNo,
+                    permissionTrafficGroup.plaqueType,
+                    permissionTrafficGroup.id,
+                    permissionTrafficGroup.name
+                );
+
+
+                await _redisRepository.setANPR(anprRedisData);
+
+                await io.to(gateId).emit("ANPRData", new ANPRDataSocketModel(
+                    gateId,
+                    true,
+                    plateData.DateTime,
+                    plateData.image,
+                    permissionTrafficGroup.name,
+                    '',
+                    permissionTrafficGroup.plaqueNo,
+                    permissionTrafficGroup.plaqueType,
+
+                ));
+
+                console.info(`In ProcessANPRPlate Found In TrafficControl List!`);
+
+            }
+
+
+        }
 
     }
 
@@ -505,6 +702,7 @@ export default function socketService() {
         proccesRFIDTag,
         proccesANPRPlate,
         getSocketConnectInfoByToken,
-        findGateServiceToGateSettingByToken
+        findGateServiceToGateSettingByToken,
+        proccesHFCard
     }
 }

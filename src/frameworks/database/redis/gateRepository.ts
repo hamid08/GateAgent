@@ -13,12 +13,10 @@ export default function gateRepository() {
     redisConnection.connect();
   const redisClient = redisConnection.connection;
 
-
   async function testRedisConnection(): Promise<boolean> {
     try {
-      await redisClient.hSet('myhash', 'field1', 'value1', 'EX', 60, function (err: any, reply: any) {
-        console.log(reply); // 1
-      });
+      await redisClient.hSet('myhash', 'field1', 'value1');
+      await redisClient.expire('myhash', 10);
 
       return true;
     } catch (error) {
@@ -43,35 +41,7 @@ export default function gateRepository() {
 
   };
 
-  // const redis = require('redis');
-  // const client = redis.createClient();
 
-  // client.on('connect', function() {
-  //   console.log('Connected to Redis...');
-
-  //   // Search for keys that match the pattern 'vehicle_*'
-  //   client.keys('vehicle_*', function(err, keys) {
-  //     if (err) return console.log(err);
-
-  //     // Check if any of the keys contain the value 'F3'
-  //     const keyWithF3 = keys.find(key => {
-  //       client.get(key, function(err, value) {
-  //         if (value && JSON.parse(value).name === 'F3') {
-  //           console.log(`Found item with F3: ${key}`);
-  //         }
-  //       });
-  //     });
-
-  //     // Check if any of the keys contain the value '193b56895'
-  //     const keyWith193b56895 = keys.find(key => {
-  //       client.get(key, function(err, value) {
-  //         if (value && JSON.parse(value).id.toString() === '193b56895') {
-  //           console.log(`Found item with 193b56895: ${key}`);
-  //         }
-  //       });
-  //     });
-  //   });
-  // });
 
 
   return {

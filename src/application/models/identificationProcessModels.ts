@@ -220,7 +220,6 @@ export class ANPRPureDataModel {
 
 }
 
-
 export class ANPRDetectedDataModel {
 
     constructor(
@@ -269,9 +268,6 @@ export class ANPRDetectedDataModel {
 
 }
 
-
-
-
 export class ANPRCacheDataModel {
 
     constructor(
@@ -292,6 +288,45 @@ export class ANPRCacheDataModel {
     detectedData?: ANPRDetectedDataModel;
 
 }
+
+export class ANPRDataSocketModel {
+
+    constructor(
+        gateId: string,
+        found: boolean,
+        dateTime:Date,
+        image:string,
+        name?: string,
+        vehicleIdentity?: string,
+        plaqueNo?: string,
+        plaqueType?: VehiclePlaqueType,
+
+
+
+    ) {
+
+        this.gateId = gateId;
+        this.found = found;
+        this.dateTime = dateTime;
+        this.image = image;
+        this.name = name;
+        this.vehicleIdentity = vehicleIdentity;
+        this.plaqueNo = plaqueNo;
+        this.plaqueType = plaqueType;
+
+    }
+
+    gateId: string;
+    found: boolean;
+    dateTime:Date;
+    image:string;
+    name?: string;
+    vehicleIdentity?: string;
+    plaqueNo?: string;
+    plaqueType?: VehiclePlaqueType;
+
+}
+
 
 
 
@@ -380,9 +415,9 @@ export class HFCacheDataModel {
 export class HFDataSocketModel {
 
     constructor(
-        name: string, // نام راننده یا نام در کنترل تردد
         gateId: string,
         found: boolean,
+        name?: string, // نام راننده یا نام در کنترل تردد
         image?: string,
 
 
@@ -396,7 +431,7 @@ export class HFDataSocketModel {
 
     }
 
-    name: string;
+    name?: string;
     gateId: string;
     image?: string;
     found: boolean;

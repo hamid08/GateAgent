@@ -16,7 +16,7 @@ import {
   RfidAntenna
 } from '../../../../application/models/smartGateModels';
 
-import { encryptPassword,replaceChars } from '../../../../application/utils/generators';
+import { encryptPassword, replaceChars } from '../../../../application/utils/generators';
 
 import { UserModel } from '../../../../application/models/userModels';
 import { GridResultModel } from '../../../../application/models/baseModels';
@@ -162,6 +162,11 @@ export default function gateRepositoryMongoDB() {
     return await Vehicle.findOne({ rfidTag: cardNo }); //TODO Change to CardNo
   }
 
+  async function findInTrafficControlListByCardNo(cardNo: string): Promise<TrafficGroupModel | null> {
+    return await TrafficGroup.findOne({ cardNumber: cardNo });
+  }
+
+
   async function findInTaxiListByTag(tag: string): Promise<VehicleModel | null> {
     return await Vehicle.findOne({ rfidTag: tag });
   }
@@ -170,25 +175,16 @@ export default function gateRepositoryMongoDB() {
     return await TrafficGroup.findOne({ rfidTag: tag });
   }
 
-  async function findInTrafficControlListByCardNo(cardNo: string): Promise<TrafficGroupModel | null> {
-    return await TrafficGroup.findOne({ cardNumber: cardNo });
+  async function findInTaxiListByPlaqueNo(plaqueNo: string): Promise<VehicleModel | null> {
+    return await Vehicle.findOne({ plaqueNo: plaqueNo });
+  }
+
+  async function findInTrafficControlListByPlaqueNo(plaqueNo: string): Promise<TrafficGroupModel | null> {
+    return await TrafficGroup.findOne({ plaqueNo: plaqueNo });
   }
 
 
-  async function findVehicleByPlate(plate: string): Promise<VehicleModel | null> {
 
-    try {
-      const result = await Vehicle.findOne({ plaqueNo: plate });
-      if (result) {
-        return result;
-      } else {
-        return null;
-      }
-    } catch (error) {
-      console.error(error);
-      return null;
-    }
-  }
 
 
 
@@ -335,7 +331,6 @@ export default function gateRepositoryMongoDB() {
     gateCameras,
     gateRfidAntennas,
     findInTaxiListByTag,
-    findVehicleByPlate,
 
     removeSmartGateByIdentity,
     getSmartGates,
@@ -353,7 +348,10 @@ export default function gateRepositoryMongoDB() {
     findInTrafficControlListByTag,
 
     findInTrafficControlListByCardNo,
-    findInTaxiListByCardNo
+    findInTaxiListByCardNo,
+
+    findInTaxiListByPlaqueNo,
+    findInTrafficControlListByPlaqueNo
 
   };
 }
