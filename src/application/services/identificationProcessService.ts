@@ -6,7 +6,7 @@ import {
 
 } from '../models/identificationProcessModels';
 
-export default function gateService() {
+export default function identificationProcessService() {
 
 
 

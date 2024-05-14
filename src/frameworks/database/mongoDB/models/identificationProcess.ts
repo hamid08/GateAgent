@@ -1,6 +1,7 @@
 import { Schema, model } from 'mongoose';
 
 import {
+    IdentificationProcessFinishReason,
     IdentificationProcessStatus,
     IdentificationProcessTrafficType,
     VehiclePlaqueType
@@ -15,25 +16,26 @@ interface IIdentificationProcess {
     endProcessTime: Date,
     status: IdentificationProcessStatus, // وضعیت
     finishedProcess: boolean,
-    name: string, // شناسه / نام
+    name: string, // شناسه خودرو / نام
 
 
-    trafficType: IdentificationProcessTrafficType, // نوع تردد
-    permissionTrafficGroupId?: string, // شناسه کنترل ترددی
-    vehicleId?: string, // شناسه خودرو
-    driverId?: string,
     hf: boolean,
     anpr: boolean,
     rfid: boolean,
 
-    hfData?: string,
-    anprData?: string,
-    rfidData?: string,
+    trafficType: IdentificationProcessTrafficType, // نوع تردد
+
+    permissionTrafficGroupId?: string, // شناسه کنترل ترددی
+    vehicleId?: string, // شناسه خودرو
+    driverId?: string,
+
+    driverFullName?: string,
 
     plaqueNo?: string,
     plaqueType?: VehiclePlaqueType,
     vehicleType?: string,
 
+    finishedReason?: IdentificationProcessFinishReason
 
 
 
@@ -56,14 +58,15 @@ const identificationProcessSchema = new Schema<IIdentificationProcess>({
     anpr: { type: Boolean, default: false },
     rfid: { type: Boolean, default: false },
 
-    hfData: { type: String, required: false },
-    anprData: { type: String, required: false },
-    rfidData: { type: String, required: false },
+    driverFullName: { type: String, required: false },
 
 
     plaqueNo: { type: String, required: false },
     plaqueType: { type: Number, enum: VehiclePlaqueType, required: false },
     vehicleType: { type: String, required: false },
+
+    finishedReason: { type: Number, enum: IdentificationProcessFinishReason, required: false },
+
 
 });
 

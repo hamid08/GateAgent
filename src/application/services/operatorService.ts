@@ -40,7 +40,7 @@ import { testAvailableIpPort } from '../utils/generators';
 import config from '../../config/config';
 
 
-export default function gateService() {
+export default function operatorService() {
 
 
 

@@ -208,6 +208,23 @@ export enum IdentificationProcessStatus {
 
     //ناموفق
     UnSuccessful = 2,
+
+    //آفلاین
+    Offline = 3
+}
+
+export enum IdentificationProcessFinishReason {
+    //اعتبارسنجی سمت سرور
+    ServerValidation = 1,
+
+    //پایان یافتن عملیت
+    FinishProcess = 2,
+
+    //انصراف توسط اپراتور
+    CancelByOperator = 3,
+
+    //انصراف توسط سیستم گیت
+    CancelByGateSystem = 4,
 }
 
 

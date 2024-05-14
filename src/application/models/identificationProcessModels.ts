@@ -9,58 +9,54 @@ import {
 
 
 
-export class IdentificationProcessModel {
+export interface IdentificationProcessModel {
 
-    constructor(
-        gateId: string,
-        startProcessTime: Date,
-        endProcessTime: Date,
-        status: IdentificationProcessStatus, // وضعیت
-        finishedProcess: boolean,
-        name: string, // شناسه / نام
-        hf: boolean,
-        anpr: boolean,
-        rfid: boolean,
-        trafficType: IdentificationProcessTrafficType, // نوع تردد
-        permissionTrafficGroupId?: string, // شناسه کنترل ترددی
-        vehicleId?: string, // شناسه خودرو
-        driverId?: string,
+    // constructor(
+    //     gateId: string,
+    //     startProcessTime: Date,
+    //     endProcessTime: Date,
+    //     status: IdentificationProcessStatus, // وضعیت
+    //     finishedProcess: boolean,
+    //     name: string, // شناسه / نام
+    //     hf: boolean,
+    //     anpr: boolean,
+    //     rfid: boolean,
+    //     trafficType: IdentificationProcessTrafficType, // نوع تردد
+    //     permissionTrafficGroupId?: string, // شناسه کنترل ترددی
+    //     vehicleId?: string, // شناسه خودرو
+    //     driverId?: string,
 
-        hfData?: string,
-        anprData?: string,
-        rfidData?: string,
+    //     driverFullName?: string,
 
-        plaqueNo?: string,
-        plaqueType?: VehiclePlaqueType,
-        vehicleType?: string,
-    ) {
+    //     plaqueNo?: string,
+    //     plaqueType?: VehiclePlaqueType,
+    //     vehicleType?: string,
+    // ) {
 
-        this.gateId = gateId;
-        this.startProcessTime = startProcessTime;
-        this.endProcessTime = endProcessTime;
-        this.status = status;
-        this.finishedProcess = finishedProcess;
-        this.plaqueType = plaqueType;
-        this.name = name;
-        this.hf = hf;
-        this.anpr = anpr;
-        this.rfid = rfid;
-        this.trafficType = trafficType;
-        this.permissionTrafficGroupId = permissionTrafficGroupId;
-        this.vehicleId = vehicleId;
-        this.driverId = driverId;
-        this.hfData = hfData;
-        this.anprData = anprData;
-        this.rfidData = rfidData;
-        this.plaqueNo = plaqueNo;
-        this.plaqueType = plaqueType;
-        this.vehicleType = vehicleType;
+    //     this.gateId = gateId;
+    //     this.startProcessTime = startProcessTime;
+    //     this.endProcessTime = endProcessTime;
+    //     this.status = status;
+    //     this.finishedProcess = finishedProcess;
+    //     this.plaqueType = plaqueType;
+    //     this.name = name;
+    //     this.hf = hf;
+    //     this.anpr = anpr;
+    //     this.rfid = rfid;
+    //     this.trafficType = trafficType;
+    //     this.permissionTrafficGroupId = permissionTrafficGroupId;
+    //     this.vehicleId = vehicleId;
+    //     this.driverId = driverId;
+    //     this.driverFullName = driverFullName;
+    //     this.plaqueNo = plaqueNo;
+    //     this.plaqueType = plaqueType;
+    //     this.vehicleType = vehicleType;
 
-    }
+    // }
 
     gateId: string;
     startProcessTime: Date;
-    endProcessTime: Date;
+    endProcessTime?: Date;
     status: IdentificationProcessStatus; // وضعیت
     finishedProcess: boolean;
     name: string; // شناسه / نام
@@ -72,9 +68,7 @@ export class IdentificationProcessModel {
     vehicleId?: string; // شناسه خودرو
     driverId?: string;
 
-    hfData?: string;
-    anprData?: string;
-    rfidData?: string;
+    driverFullName?: string;
 
     plaqueNo?: string;
     plaqueType?: VehiclePlaqueType;
@@ -294,8 +288,8 @@ export class ANPRDataSocketModel {
     constructor(
         gateId: string,
         found: boolean,
-        dateTime:Date,
-        image:string,
+        dateTime: Date,
+        image: string,
         name?: string,
         vehicleIdentity?: string,
         plaqueNo?: string,
@@ -318,8 +312,8 @@ export class ANPRDataSocketModel {
 
     gateId: string;
     found: boolean;
-    dateTime:Date;
-    image:string;
+    dateTime: Date;
+    image: string;
     name?: string;
     vehicleIdentity?: string;
     plaqueNo?: string;
