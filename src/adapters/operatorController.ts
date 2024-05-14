@@ -175,6 +175,23 @@ export default function operatorController() {
     };
 
 
+    const cancelProcess = async (req: any, res: any, next: any) => {
+        try {
+
+            if (!req.params.hasOwnProperty('gateId')) {
+                throw new Error('شناسه گیت الزامی می باشد');
+            }
+
+            const { gateId } = req.params;
+            res.status(200).send(successResult('', await operatorService().cancelProcess(gateId)));
+        } catch (error: any) {
+            console.error(error);
+            res.status(200).send(faildResult(error.message));
+        }
+    };
+
+
+
 
     return {
         getGates,
@@ -184,7 +201,8 @@ export default function operatorController() {
         finishProcess,
         identificationProcessGrid,
         offlineTrafficsGrid,
-        detectionState
+        detectionState,
+        cancelProcess
     }
 
 }

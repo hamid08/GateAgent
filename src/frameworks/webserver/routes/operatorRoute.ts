@@ -331,4 +331,31 @@ export default async function routes(app: Express) {
     app.post('/api/operator/gates/:gateId/offlineTraffics/grid', operatorController().offlineTrafficsGrid);
 
 
+
+    /** DELETE Methods */
+    /**
+     * @openapi
+     * '/api/operator/gates/{gateId}/cancelProcess':
+     *  delete:
+     *     tags:
+     *     - Operator Panel
+     *     summary: Delete gate by Id
+     *     parameters:
+     *      - name: gateId
+     *        in: path
+     *        description: The unique Id of the gate
+     *        required: true
+     *     responses:
+     *      200:
+     *        description: Removed
+     *      400:
+     *        description: Bad request
+     *      404:
+     *        description: Not Found
+     *      500:
+     *        description: Server Error
+     */
+
+    app.delete('/api/operator/gates/:gateId/cancelProcess', operatorController().cancelProcess);
+
 }

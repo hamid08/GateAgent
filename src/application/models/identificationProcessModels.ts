@@ -1,6 +1,7 @@
 
 import {
 
+    IdentificationProcessFinishReason,
     IdentificationProcessStatus,
     IdentificationProcessTrafficType,
     VehiclePlaqueType
@@ -73,6 +74,8 @@ export interface IdentificationProcessModel {
     plaqueNo?: string;
     plaqueType?: VehiclePlaqueType;
     vehicleType?: string;
+
+    finishedReason?: IdentificationProcessFinishReason
 
 }
 

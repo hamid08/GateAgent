@@ -199,6 +199,9 @@ export enum IdentityMessageType {
 
     // اسکن قبض سفر
     ScanTicket = 6,
+
+    // انصراف از فرآیند
+    CancelProcess = 7,
 }
 
 
@@ -214,10 +217,10 @@ export enum IdentificationProcessStatus {
 }
 
 export enum IdentificationProcessFinishReason {
-    //اعتبارسنجی سمت سرور
+    //عدم اعتبارسنجی سمت سرور
     ServerValidation = 1,
 
-    //پایان یافتن عملیت
+    //پایان یافتن موفق فرآیند
     FinishProcess = 2,
 
     //انصراف توسط اپراتور
@@ -225,6 +228,9 @@ export enum IdentificationProcessFinishReason {
 
     //انصراف توسط سیستم گیت
     CancelByGateSystem = 4,
+
+    //پایان یافتن موفق فرآیند بصورت آفلاین
+    FinishProcessOffline = 4,
 }
 
 

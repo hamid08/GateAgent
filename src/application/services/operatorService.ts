@@ -105,7 +105,14 @@ export default function operatorService() {
     }
 
 
+    const cancelProcess = async (gateId: string): Promise<Operator_IdentityResultBox_Model> => {
 
+        //TODO Save InDb Information And Finish Process
+
+
+        return new Operator_IdentityResultBox_Model(IdentityResultType.Error, IdentityMessageType.CancelProcess, 'فرآیند شناسایی و عملیات لغو شد');
+
+    }
 
 
 
@@ -234,7 +241,8 @@ export default function operatorService() {
         finishProcess,
         identificationProcessGrid,
         offlineTrafficsGrid,
-        detectionState
+        detectionState,
+        cancelProcess
     }
 
 }
