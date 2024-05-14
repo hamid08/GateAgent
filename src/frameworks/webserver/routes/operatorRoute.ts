@@ -118,11 +118,11 @@ export default async function routes(app: Express) {
     /** POST Methods */
     /**
      * @openapi
-     * '/api/operator/gates/{gateId}/scanTicket/offline':
+     * '/api/operator/gates/{gateId}/finishProcess':
      *  post:
      *     tags:
      *     - Operator Panel
-     *     summary: scanTicket Offline
+     *     summary: finishProcess Detections
      *     parameters:
      *      - name: gateId
      *        in: path
@@ -150,46 +150,41 @@ export default async function routes(app: Express) {
      *        description: Server Error
      */
 
-    app.post('/api/operator/gates/:gateId/scanTicket/offline', operatorController().scanTicketOffline);
+    app.post('/api/operator/gates/:gateId/finishProcess', operatorController().finishProcess);
+
+
+    /** GET Methods
+            * @openapi
+            * '/api/operator/gates/{gateId}/detectionState':
+            *  get:
+            *     tags:
+            *     - Operator Panel
+            *     summary: Get detectionState 
+            *     parameters:
+            *      - name: gateId
+            *        in: path
+            *        description: The unique Id of the gate
+            *        required: true
+            *     responses:
+            *      200:
+            *        description: Fetched successfully
+            *      400:
+            *        description: Bad Request
+            *      404:
+            *        description: Not Found
+            *      500:
+            *        description: Server Error
+            */
+
+    app.get('/api/operator/gates/:gateId/detectionState', operatorController().detectionState);
 
 
 
-    /** POST Methods */
-    /**
-     * @openapi
-     * '/api/operator/gates/{gateId}/scanTicket/online':
-     *  post:
-     *     tags:
-     *     - Operator Panel
-     *     summary: scanTicket online
-     *     parameters:
-     *      - name: gateId
-     *        in: path
-     *        description: The unique Id of the gate
-     *        required: true
-     *     requestBody:
-     *      required: true
-     *      content:
-     *        application/json:
-     *           schema:
-     *            type: object
-     *            required:
-     *              - tripNumber
-     *            properties:
-     *              tripNumber:
-     *                type: string
-     *     responses:
-     *      201:
-     *        description: Created
-     *      409:
-     *        description: Conflict
-     *      404:
-     *        description: Not Found
-     *      500:
-     *        description: Server Error
-     */
 
-    app.post('/api/operator/gates/:gateId/scanTicket/online', operatorController().scanTicketOnline);
+
+
+
+
 
 
 

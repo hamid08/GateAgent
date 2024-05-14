@@ -57,6 +57,23 @@ export default function operatorController() {
     }
 
 
+    const detectionState = async (req: any, res: any, next: any) => {
+        try {
+
+            if (!req.params.hasOwnProperty('gateId')) {
+                throw new Error('شناسه گیت الزامی می باشد');
+            }
+
+            const { gateId } = req.params;
+
+            res.status(200).send(successResult('', await operatorService().detectionState(gateId)));
+        } catch (error: any) {
+            console.error(error);
+            res.status(200).send(faildResult(error.message));
+        }
+    }
+
+
     const connectionTest = async (req: any, res: any, next: any) => {
         try {
 
@@ -80,14 +97,10 @@ export default function operatorController() {
     }
 
 
-    const scanTicketOffline = async (req: any, res: any, next: any) => {
+    const finishProcess = async (req: any, res: any, next: any) => {
         try {
             if (!req.params.hasOwnProperty('gateId')) {
                 throw new Error('شناسه گیت الزامی می باشد');
-            }
-
-            if (!req.body.hasOwnProperty('tripNumber')) {
-                throw new Error('شماره سفر الزامی می باشد');
             }
 
             const { tripNumber } = req.body;
@@ -95,37 +108,13 @@ export default function operatorController() {
             const { gateId } = req.params;
 
 
-            res.status(200).send(successResult('', await operatorService().scanTicketOffline(gateId, tripNumber)));
+            res.status(200).send(successResult('', await operatorService().finishProcess(gateId, tripNumber)));
 
         } catch (error: any) {
             console.error(error);
             res.status(200).send(faildResult(error.message));
         }
     };
-
-    const scanTicketOnline = async (req: any, res: any, next: any) => {
-        try {
-            if (!req.params.hasOwnProperty('gateId')) {
-                throw new Error('شناسه گیت الزامی می باشد');
-            }
-
-            if (!req.body.hasOwnProperty('tripNumber')) {
-                throw new Error('شماره سفر الزامی می باشد');
-            }
-
-            const { tripNumber } = req.body;
-
-            const { gateId } = req.params;
-
-
-            res.status(200).send(successResult('', await operatorService().scanTicketOnline(gateId, tripNumber)));
-
-        } catch (error: any) {
-            console.error(error);
-            res.status(200).send(faildResult(error.message));
-        }
-    };
-
 
 
     const identificationProcessGrid = async (req: any, res: any, next: any) => {
@@ -192,10 +181,10 @@ export default function operatorController() {
         getGateDetailsById,
         connectionTest,
         getLivePlaqueImage,
-        scanTicketOffline,
-        scanTicketOnline,
+        finishProcess,
         identificationProcessGrid,
-        offlineTrafficsGrid
+        offlineTrafficsGrid,
+        detectionState
     }
 
 }

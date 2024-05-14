@@ -158,11 +158,18 @@ export default async function routes(app: Express) {
 
     /** GET Methods
     * @openapi
-    * '/api/socketTest/scanTicketModal':
+    * '/api/socketTest/finishProcess':
     *  get:
     *     tags:
     *     - Socket Test
-    *     summary: Test scanTicketModal
+    *     summary: Test finishProcess
+    *     parameters:
+    *      - name: needTripNumber
+    *        in: query
+    *        description: 
+    *        required: true
+    *        schema:
+    *          type: boolean
     *     security:
     *       - bearerAuth: []
     *     responses:
@@ -182,7 +189,7 @@ export default async function routes(app: Express) {
     *           bearerFormat: JWT
     */
 
-    app.get('/api/socketTest/scanTicketModal', socketTestController().scanTicketModal);
+    app.get('/api/socketTest/finishProcess', socketTestController().finishProcess);
 
 
     /** GET Methods
@@ -220,5 +227,36 @@ export default async function routes(app: Express) {
 
 
     app.get('/api/socketTest/identificationStatus', socketTestController().identificationStatus);
+
+
+
+    /** GET Methods
+               * @openapi
+               * '/api/socketTest/identificationReadData':
+               *  get:
+               *     tags:
+               *     - Socket Test
+               *     summary: Test identificationReadData
+               *     parameters:
+               *      - name: type
+               *        in: query
+               *        description: 
+               *        required: true
+               *        schema:
+               *          type: integer
+               *          default: 1
+               *     responses:
+               *      200:
+               *        description: Fetched successfully
+               *      400:
+               *        description: Bad Request
+               *      404:
+               *        description: Not Found
+               *      500:
+               *        description: Server Error
+               */
+
+
+    app.get('/api/socketTest/identificationReadData', socketTestController().identificationReadData);
 
 }

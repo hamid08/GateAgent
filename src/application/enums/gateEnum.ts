@@ -229,10 +229,19 @@ export enum IdentifierConnectionStatus {
 }
 
 export enum GateIdentificationType {
-    RFID = 1,
-    ANPR = 2,
-    Kiosk = 3,
-    NetAccess = 4,
+    RFID = 1, // تگ خوان
+    ANPR = 2, // پلاک خوان
+    NetAccess = 3, // شبکه اینترنت داخلی
+    ServiceServer = 4, // گیت سرویس نقلیه
+    LocalAgent = 5, // سرور ایجنت گیت
+    HF = 6
+
+}
+
+export enum GateIdentificationTestType {
+    Client = 1, // تست توسط خود کلاینت که همان gate web هست 
+    Server = 2, // تست توسط api و سرور
+    Socket = 3, //  تست توسط سوکت و در لحظه اعلان می شود
 }
 
 

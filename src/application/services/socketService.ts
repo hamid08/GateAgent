@@ -1,4 +1,4 @@
-import { TagDataModel, ANPRDataModel, HFDataModel } from '../models/smartGateModels';
+import { TagDataModel, ANPRDataModel, HFDataModel, SmartGateModel } from '../models/smartGateModels';
 import { SocketModel } from '../models/gateSettingModels';
 import mongoRepository from '../../frameworks/database/mongoDB/repositories/gateRepository';
 import gateSettingRepository from '../../frameworks/database/mongoDB/repositories/gateSettingRepository';
@@ -31,7 +31,10 @@ import {
 } from '../models/identificationProcessModels';
 
 import identificationProcessRedisRepository from '../../frameworks/database/redis/identificationProcessRedisRepository';
-import { IdentificationProcessTrafficType, SmartGatePriority } from '../enums/gateEnum';
+import { AcceptanceType, HumanDetectTools, IdentificationProcessTrafficType, SmartGatePriority, SmartGateType, VehicleDetectTools } from '../enums/gateEnum';
+
+import config from '../../config/config';
+
 
 export default function socketService() {
     const _mongoRepository = mongoRepository();
@@ -49,7 +52,7 @@ export default function socketService() {
         return await gateSettingRepository().findGateServiceToGateSettingByToken(token);
     }
 
-    const checkIsRunProcessOrTemporaryLockProcess = async function (gateId:string): Promise<boolean> {
+    const checkIsRunProcessOrTemporaryLockProcess = async function (gateId: string): Promise<boolean> {
 
         return await identificationProcessService().isRunProcess() || await _redisRepository.existTemporaryLockProcess(gateId);
     }
@@ -271,7 +274,6 @@ export default function socketService() {
 
     }
 
-
     const proccesHFCard = async function (cardData: HFDataModel) {
 
         var gateId = cardData.gateId;
@@ -359,7 +361,7 @@ export default function socketService() {
                     '1', //TODO Set DriverId
                     '', // TODO Set NationalNo
                     'محمد رضا احدی',
-                    '', // TODO Set Driver Avatar
+                    config.socket.driverAvatar64, // TODO Set Driver Avatar
 
                 );
 
@@ -414,7 +416,7 @@ export default function socketService() {
                             '1', //TODO Set DriverId
                             '', // TODO Set NationalNo
                             'محمد رضا احدی',
-                            '', // TODO Set Driver Avatar
+                            config.socket.driverAvatar64, // TODO Set Driver Avatar
 
                         );
 
@@ -469,8 +471,6 @@ export default function socketService() {
         }
 
     }
-
-
 
     const proccesANPRPlate = async function (plateData: ANPRDataModel) {
 
@@ -632,9 +632,9 @@ export default function socketService() {
                             vehicle.identity,
                             vehicle.vehicleUserTypeCaption
                         );
-        
+
                         await _redisRepository.setANPR(anprRedisData);
-        
+
                         await io.to(gateId).emit("ANPRData", new ANPRDataSocketModel(
                             gateId,
                             true,
@@ -644,9 +644,9 @@ export default function socketService() {
                             vehicle.identity,
                             vehicle.plaqueNo,
                             vehicle.plaqueType,
-        
+
                         ));
-        
+
                         console.info(`In ProcessANPRPlate Found In Taxi List!`);
 
                     }
@@ -696,6 +696,220 @@ export default function socketService() {
         }
 
     }
+
+
+    const checkDetection = async function (gateId: string, gateSetting: SmartGateModel) {
+
+
+        // Check Gate Type
+        if (gateSetting.gateType != SmartGateType.CheckPoint) {
+            console.warn(`CheckDetection Failed Because GateType Not Equal CheckPoint!`);
+            return;
+        }
+
+
+        //Start Check Listener Data Into Redis
+
+        // HFDataRedis
+        const hfRedisData = await _redisRepository.getHF(gateId);
+
+        // RFIDDataRedis
+        const rfidRedisData = await _redisRepository.getRFID(gateId);
+
+        // ANPRDataRedis
+        const anprRedisData = await _redisRepository.getANPR(gateId);
+
+
+        //HFRedisDetected
+        const hfRedisDetected = hfRedisData && hfRedisData.detected && hfRedisData.detectedData;
+
+        //RFIDRedisDetected
+        const rfidRedisDetected = rfidRedisData && rfidRedisData.detected && rfidRedisData.detectedData;
+
+        //ANPRRedisDetected
+        const anprRedisDetected = anprRedisData && anprRedisData.detected && anprRedisData.detectedData;
+
+
+
+        if (hfRedisDetected) { // Start By HF Detection Process
+
+            if (hfRedisData.detectedData!.trafficType == IdentificationProcessTrafficType.Taxi) { // Founded In Taxi List
+
+                var taxiWorkModeInfo = gateSetting.taxiWorkModeInfo;
+
+                if (taxiWorkModeInfo.acceptanceType == AcceptanceType.All) { // For This Check HumanDetect & VehicleDetect
+
+                    var driverInfo = hfRedisData;
+                    var vehicleANPRInfo = anprRedisData;
+                    var vehicleRFIDInfo = rfidRedisData;
+
+
+                    //#region  Check HumanDetect
+                    // ==========================> Human Is Detect
+
+                    //#endregion
+
+
+                    //#region  Check VehicleDetect
+
+                    if (taxiWorkModeInfo.vehicleAcceptanceType == AcceptanceType.All) { // For This Check ANPR & RFID Is Detect
+
+                        // Check ANPR Detect In Redis
+                        if (!anprRedisDetected) {
+                            //TODO Send Socket For Need ANPR Data In Redis
+
+                            console.warn(`CheckDetection Failed Because Need To ANPRRedisData!`);
+                            return;
+
+                        }
+
+                        // Check Detect RFID In Redis
+                        if (!rfidRedisDetected) {
+                            //TODO Send Socket For Need RFID Data In Redis Insert Card
+
+                            console.warn(`CheckDetection Failed Because Need To RFIDRedisData!`);
+                            return;
+                        }
+                    }
+
+                    else { // For This Check ANPR | RFID Is Detect
+
+                        // Check ANPR OR RFID Detect In Redis
+                        if (!anprRedisDetected && !rfidRedisDetected) {
+
+                            //TODO Send Socket For Need ANPR OR RFID Data In Redis
+
+                            console.warn(`CheckDetection Failed Because Need To ANPRRedisData OR RFIDRedisData!`);
+                            return;
+
+                        }
+
+                        if (!anprRedisDetected) vehicleANPRInfo = null;
+                        if (!rfidRedisDetected) vehicleRFIDInfo = null;
+                    }
+
+                    //#endregion
+
+
+                    //#region  Check Driver Is Match By Vehicle
+
+                    //TODO Check Match Driver By Vehicle
+
+
+                    //#endregion
+
+
+                    // TODO  ===========================================> Create IdentificationProcess
+
+
+
+                }
+
+                else { // For This Check HumanDetect | VehicleDetect
+
+                    // In This State Because HF Detect And HumanDetect Is True And Pass
+
+                    // TODO  ===========================================> Create IdentificationProcess By Type Taxi
+
+                }
+
+            }
+            else { // Founded In TrafficControl List
+
+                var trafficControlWorkModeInfo = gateSetting.trafficControlWorkModeInfo;
+
+                if (trafficControlWorkModeInfo.acceptanceType == AcceptanceType.All) { // For This Check HumanDetect & VehicleDetect
+
+                    var driverInfo = hfRedisData;
+                    var vehicleANPRInfo = anprRedisData;
+                    var vehicleRFIDInfo = rfidRedisData;
+
+
+                    //#region  Check HumanDetect
+                    // ==========================> Human Is Detect
+
+                    //#endregion
+
+
+                    //#region  Check VehicleDetect
+
+                    if (trafficControlWorkModeInfo.vehicleAcceptanceType == AcceptanceType.All) { // For This Check ANPR & RFID Is Detect
+
+                        // Check ANPR Detect In Redis
+                        if (!anprRedisDetected) {
+                            //TODO Send Socket For Need ANPR Data In Redis
+
+                            console.warn(`CheckDetection Failed Because Need To ANPRRedisData!`);
+                            return;
+
+                        }
+
+                        // Check Detect RFID In Redis
+                        if (!rfidRedisDetected) {
+                            //TODO Send Socket For Need RFID Data In Redis Insert Card
+
+                            console.warn(`CheckDetection Failed Because Need To RFIDRedisData!`);
+                            return;
+                        }
+                    }
+
+                    else { // For This Check ANPR | RFID Is Detect
+
+                        // Check ANPR OR RFID Detect In Redis
+                        if (!anprRedisDetected && !rfidRedisDetected) {
+
+                            //TODO Send Socket For Need ANPR OR RFID Data In Redis
+
+                            console.warn(`CheckDetection Failed Because Need To ANPRRedisData OR RFIDRedisData!`);
+                            return;
+
+                        }
+
+                        if (!anprRedisDetected) vehicleANPRInfo = null;
+                        if (!rfidRedisDetected) vehicleRFIDInfo = null;
+                    }
+
+                    //#endregion
+
+
+
+                    // TODO  ===========================================> Create IdentificationProcess By Type TrafficControl
+
+
+
+                }
+
+                else { // For This Check HumanDetect | VehicleDetect
+
+                    // In This State Because HF Detect And HumanDetect Is True And Pass
+
+                    // TODO  ===========================================> Create IdentificationProcess By Type TrafficControl
+
+                }
+
+
+
+            }
+
+
+
+        }
+
+
+        else if (rfidRedisDetected) { // Start By RFID Detection Process
+
+        }
+
+        else if (anprRedisDetected) { // Start By ANPR Detection Process
+
+        }
+
+
+
+
+    }
+
+
 
 
     return {

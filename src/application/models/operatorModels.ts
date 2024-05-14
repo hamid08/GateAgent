@@ -8,7 +8,8 @@ import {
     IdentificationProcessStatus,
     IdentificationProcessTrafficType,
     VehiclePlaqueType,
-    OfflineTrafficsType
+    OfflineTrafficsType,
+    GateIdentificationTestType
 
 } from '../enums/gateEnum';
 
@@ -207,7 +208,7 @@ export class Operator_IdentityResultBox_Model {
         type: IdentityResultType,
         messageType: IdentityMessageType,
         description: string,
-        identityInfo: Operator_IdentityResultBoxInfo_Model,
+        identityInfo?: Operator_IdentityResultBoxInfo_Model,
 
     ) {
 
@@ -221,7 +222,7 @@ export class Operator_IdentityResultBox_Model {
     type: IdentityResultType;
     messageType: IdentityMessageType;
     description: string;
-    identityInfo: Operator_IdentityResultBoxInfo_Model;
+    identityInfo?: Operator_IdentityResultBoxInfo_Model;
 
 }
 
@@ -249,71 +250,31 @@ export class Operator_Gate_Model {
 }
 
 
-export class StatusConnectionCardItemTooltipInfo {
-
-    constructor(
-        intervalTime: number,
-        ip?: string,
-        port?: number,
-
-    ) {
-
-        this.ip = ip;
-        this.port = port;
-        this.intervalTime = intervalTime;
-
-    }
-
-    ip?: string;
-    port?: number;
-    intervalTime: number;
-
-}
-
-export class StatusConnectionCardItems {
-
-    constructor(
-        caption: string,
-        status: IdentifierConnectionStatus,
-        toolTipInfo?: StatusConnectionCardItemTooltipInfo,
-
-
-    ) {
-
-        this.caption = caption;
-        this.status = status;
-        this.toolTipInfo = toolTipInfo;
-
-    }
-
-    caption: string;
-    status: IdentifierConnectionStatus;
-    toolTipInfo?: StatusConnectionCardItemTooltipInfo;
-
-}
-
 
 export class StatusConnectionCard {
 
     constructor(
         type: GateIdentificationType,
+        testType: GateIdentificationTestType,
+        isRequired: boolean,
         status: IdentifierConnectionStatus,
         intervalTime: number,
-        items: StatusConnectionCardItems[],
 
 
     ) {
         this.type = type;
+        this.testType = testType;
+        this.isRequired = isRequired;
         this.status = status;
         this.intervalTime = intervalTime;
-        this.items = items;
 
     }
 
     type: GateIdentificationType;
+    testType: GateIdentificationTestType;
+    isRequired: boolean;
     status: IdentifierConnectionStatus;
     intervalTime: number;
-    items: StatusConnectionCardItems[];
 
 }
 
@@ -327,9 +288,6 @@ export class Operator_GateDetails_Model {
         rfid: boolean,
         anpr: boolean,
         hf: boolean,
-        rfidStatus: IdentifierConnectionStatus,
-        anprStatus: IdentifierConnectionStatus,
-        hfStatus: IdentifierConnectionStatus,
         statusConnectionCard: StatusConnectionCard[],
         taxiOperation?: TaxiWorkModeOperation,
 
@@ -343,9 +301,6 @@ export class Operator_GateDetails_Model {
         this.rfid = rfid;
         this.anpr = anpr;
         this.hf = hf;
-        this.rfidStatus = rfidStatus;
-        this.anprStatus = anprStatus;
-        this.hfStatus = hfStatus;
         this.statusConnectionCard = statusConnectionCard;
 
     }
@@ -358,9 +313,141 @@ export class Operator_GateDetails_Model {
     rfid: boolean;
     anpr: boolean;
     hf: boolean;
-    rfidStatus: IdentifierConnectionStatus;
-    anprStatus: IdentifierConnectionStatus;
-    hfStatus: IdentifierConnectionStatus;
     statusConnectionCard: StatusConnectionCard[];
+
+}
+
+
+
+
+
+//Detection State
+
+export class DetectionStateANPRDataModel {
+
+    constructor(
+        gateId: string,
+        found: boolean,
+        dateTime: Date,
+        image: string,
+        name?: string,
+        vehicleIdentity?: string,
+        plaqueNo?: string,
+        plaqueType?: VehiclePlaqueType,
+
+
+
+    ) {
+
+        this.gateId = gateId;
+        this.found = found;
+        this.dateTime = dateTime;
+        this.image = image;
+        this.name = name;
+        this.vehicleIdentity = vehicleIdentity;
+        this.plaqueNo = plaqueNo;
+        this.plaqueType = plaqueType;
+
+    }
+
+    gateId: string;
+    found: boolean;
+    dateTime: Date;
+    image: string;
+    name?: string;
+    vehicleIdentity?: string;
+    plaqueNo?: string;
+    plaqueType?: VehiclePlaqueType;
+
+}
+
+
+export class DetectionStateRFIDDataModel {
+
+    constructor(
+        gateId: string,
+        found: boolean,
+        name?: string,
+        vehicleIdentity?: string,
+        plaqueNo?: string,
+        plaqueType?: VehiclePlaqueType,
+
+
+
+    ) {
+
+        this.gateId = gateId;
+        this.found = found;
+        this.name = name;
+        this.vehicleIdentity = vehicleIdentity;
+        this.plaqueNo = plaqueNo;
+        this.plaqueType = plaqueType;
+
+    }
+
+    gateId: string;
+    found: boolean;
+    name?: string;
+    vehicleIdentity?: string;
+    plaqueNo?: string;
+    plaqueType?: VehiclePlaqueType;
+
+}
+
+export class DetectionStateHFDataModel {
+
+    constructor(
+        gateId: string,
+        found: boolean,
+        name?: string, // نام راننده یا نام در کنترل تردد
+        image?: string,
+
+
+    ) {
+
+        this.name = name;
+        this.gateId = gateId;
+        this.name = name;
+        this.image = image;
+        this.found = found;
+
+    }
+
+    name?: string;
+    gateId: string;
+    image?: string;
+    found: boolean;
+
+}
+
+
+export class DetectionStateModel {
+
+    constructor(
+        hasProcess: boolean,
+        needTripNumber: boolean,
+        anprData?: DetectionStateANPRDataModel,
+        rfidData?: DetectionStateRFIDDataModel,
+        hfData?: DetectionStateHFDataModel,
+        message?: Operator_IdentityResultBox_Model,
+
+
+    ) {
+
+        this.anprData = anprData;
+        this.rfidData = rfidData;
+        this.hfData = hfData;
+        this.message = message;
+        this.hasProcess = hasProcess;
+        this.needTripNumber = needTripNumber;
+
+    }
+
+    hasProcess: boolean;
+    needTripNumber: boolean;
+    anprData?: DetectionStateANPRDataModel;
+    rfidData?: DetectionStateRFIDDataModel;
+    hfData?: DetectionStateHFDataModel;
+    message?: Operator_IdentityResultBox_Model;
 
 }

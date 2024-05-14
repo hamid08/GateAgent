@@ -92,9 +92,16 @@ export default function socketTestController() {
     };
 
 
-    const scanTicketModal = async (req: any, res: any, next: any) => {
+    const finishProcess = async (req: any, res: any, next: any) => {
         try {
-            await socketTestService().scanTicketModal();
+
+            if (!req.query.hasOwnProperty('needTripNumber')) {
+                throw new Error('needTripNumber الزامی می باشد');
+            }
+
+            const needTripNumber = req.query.needTripNumber == 'false'? false:true;
+
+            await socketTestService().finishProcess(needTripNumber);
 
             res.status(200).send(successResult());
 
@@ -131,6 +138,29 @@ export default function socketTestController() {
     };
 
 
+    const identificationReadData = async (req: any, res: any, next: any) => {
+        try {
+
+
+            if (!req.query.hasOwnProperty('type')) {
+                throw new Error('نوع الزامی می باشد');
+            }
+
+
+            const type = Number(req.query.type);
+
+
+            await socketTestService().identificationReadData(type);
+
+            res.status(200).send(successResult());
+
+        } catch (error: any) {
+            console.error(error);
+            res.status(200).send(faildResult(error.message));
+        }
+    };
+
+
 
 
 
@@ -138,10 +168,10 @@ export default function socketTestController() {
         anprTest,
         hfData,
         rfidData,
-        scanTicketModal,
+        finishProcess,
         identityResultBox,
         identificationStatus,
-
+        identificationReadData
 
     }
 

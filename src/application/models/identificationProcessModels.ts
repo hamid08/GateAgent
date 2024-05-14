@@ -186,9 +186,9 @@ export class RFIDDataSocketModel {
 
         this.gateId = gateId;
         this.found = found;
-        this.name = name;
-        this.vehicleIdentity = vehicleIdentity;
-        this.plaqueNo = plaqueNo;
+        this.name = name ?? '';
+        this.vehicleIdentity = vehicleIdentity ?? '';
+        this.plaqueNo = plaqueNo ?? '';
         this.plaqueType = plaqueType;
 
     }
@@ -309,9 +309,9 @@ export class ANPRDataSocketModel {
         this.found = found;
         this.dateTime = dateTime;
         this.image = image;
-        this.name = name;
-        this.vehicleIdentity = vehicleIdentity;
-        this.plaqueNo = plaqueNo;
+        this.name = name ?? '';
+        this.vehicleIdentity = vehicleIdentity ?? '';
+        this.plaqueNo = plaqueNo ?? '';
         this.plaqueType = plaqueType;
 
     }
@@ -425,8 +425,8 @@ export class HFDataSocketModel {
 
         this.name = name;
         this.gateId = gateId;
-        this.name = name;
-        this.image = image;
+        this.name = name ?? '';
+        this.image = image ?? '';
         this.found = found;
 
     }

@@ -2,8 +2,6 @@ import { SmartGate } from "../models/smartGate";
 import {
     Operator_Gate_Model,
     Operator_GateDetails_Model,
-    StatusConnectionCardItemTooltipInfo,
-    StatusConnectionCardItems,
     StatusConnectionCard,
     IdentificationProcessGridFilterModel,
     IdentificationProcessGridModel,
@@ -21,7 +19,8 @@ import {
     OfflineTrafficsType,
     VehiclePlaqueType,
     IdentificationProcessStatus,
-    IdentificationProcessTrafficType
+    IdentificationProcessTrafficType,
+    GateIdentificationTestType
 
 } from '../../../../application/enums/gateEnum';
 import { AnprCamera, RfidAntenna } from "../../../../application/models/smartGateModels";
@@ -64,42 +63,30 @@ export default function operatorRepository() {
             return null;
         }
 
-        var statusConnectionCardItems: StatusConnectionCardItems;
 
         switch (type) {
 
-            case GateIdentificationType.NetAccess:
-                var netAccessItems: StatusConnectionCardItems[] = [];
-                netAccessItems.push(new StatusConnectionCardItems('NetAccess', IdentifierConnectionStatus.Disconnect, undefined));
+            case GateIdentificationType.ServiceServer:
 
-                return new StatusConnectionCard(GateIdentificationType.NetAccess, IdentifierConnectionStatus.Disconnect,
-                    10, netAccessItems);
+                return new StatusConnectionCard(
+                    GateIdentificationType.ServiceServer,
+                    GateIdentificationTestType.Server,
+                    false,
+                    IdentifierConnectionStatus.Disconnect,
+                    10
 
-
-            case GateIdentificationType.RFID:
-                var rfidItems: StatusConnectionCardItems[] = [];
-                rfidItems = document.rfidAntennas.map(rfid =>
-                    new StatusConnectionCardItems(rfid.caption, IdentifierConnectionStatus.Disconnect,
-                        new StatusConnectionCardItemTooltipInfo(rfid.intervalTime, rfid.ip, rfid.port)
-                    )
                 );
 
-                return new StatusConnectionCard(GateIdentificationType.RFID, IdentifierConnectionStatus.Disconnect, 30, rfidItems);
 
-            case GateIdentificationType.ANPR:
-                var anprItems: StatusConnectionCardItems[] = [];
-                anprItems = document.anprCameras.map(anpr =>
-                    new StatusConnectionCardItems(anpr.caption, IdentifierConnectionStatus.Disconnect,
-                        new StatusConnectionCardItemTooltipInfo(anpr.intervalTime, anpr.ip, anpr.port)
-                    )
+            case GateIdentificationType.LocalAgent:
+                return new StatusConnectionCard(
+                    GateIdentificationType.LocalAgent,
+                    GateIdentificationTestType.Server,
+                    true,
+                    IdentifierConnectionStatus.Connect,
+                    15
+
                 );
-
-                return new StatusConnectionCard(GateIdentificationType.ANPR, IdentifierConnectionStatus.Disconnect, 30, anprItems);
-
-            case GateIdentificationType.Kiosk:
-                var kioskItems: StatusConnectionCardItems[] = [];
-                kioskItems.push(new StatusConnectionCardItems('Kiosk', IdentifierConnectionStatus.Disconnect, undefined));
-                return new StatusConnectionCard(GateIdentificationType.Kiosk, IdentifierConnectionStatus.Disconnect, 30, kioskItems);
 
 
             default: return null;
@@ -118,40 +105,63 @@ export default function operatorRepository() {
             return null;
         }
 
+
+        var rfidStatus: boolean = document.taxiWorkModeInfo.vehicleDetectTools.includes(VehicleDetectTools.RFID) || document.trafficControlWorkModeInfo.vehicleDetectTools.includes(VehicleDetectTools.RFID);
+        var anprStatus: boolean = document.taxiWorkModeInfo.vehicleDetectTools.includes(VehicleDetectTools.ANPR) || document.trafficControlWorkModeInfo.vehicleDetectTools.includes(VehicleDetectTools.ANPR);
+        var hfStatus: boolean = document.taxiWorkModeInfo.humanDetectTools.includes(HumanDetectTools.HF) || document.trafficControlWorkModeInfo.humanDetectTools.includes(HumanDetectTools.HF);
+
         var statusConnectionCards: StatusConnectionCard[] = [];
 
         //NetAccess
-        var netAccessItems: StatusConnectionCardItems[] = [];
-        netAccessItems.push(new StatusConnectionCardItems('NetAccess', IdentifierConnectionStatus.Disconnect, undefined));
+        statusConnectionCards.push(new StatusConnectionCard(
+            GateIdentificationType.NetAccess,
+            GateIdentificationTestType.Client,
+            true,
+            IdentifierConnectionStatus.Connect,
+            0
+        ));
 
-        statusConnectionCards.push(new StatusConnectionCard(GateIdentificationType.NetAccess, IdentifierConnectionStatus.Disconnect, 10, netAccessItems));
-
-        //RFID
-        var rfidItems: StatusConnectionCardItems[] = [];
-        rfidItems = document.rfidAntennas.map(rfid =>
-            new StatusConnectionCardItems(rfid.caption, IdentifierConnectionStatus.Disconnect,
-                new StatusConnectionCardItemTooltipInfo(rfid.intervalTime, rfid.ip, rfid.port)
-            )
-        );
-
-        statusConnectionCards.push(new StatusConnectionCard(GateIdentificationType.RFID, IdentifierConnectionStatus.Disconnect, 30, rfidItems));
 
         //ANPR
-        var anprItems: StatusConnectionCardItems[] = [];
-        anprItems = document.anprCameras.map(anpr =>
-            new StatusConnectionCardItems(anpr.caption, IdentifierConnectionStatus.Disconnect,
-                new StatusConnectionCardItemTooltipInfo(anpr.intervalTime, anpr.ip, anpr.port)
-            )
-        );
+        if (anprStatus) {
+            statusConnectionCards.push(new StatusConnectionCard(
+                GateIdentificationType.ANPR,
+                GateIdentificationTestType.Socket,
+                true,
+                IdentifierConnectionStatus.Disconnect,
+                0
+            ));
+        }
 
-        statusConnectionCards.push(new StatusConnectionCard(GateIdentificationType.ANPR, IdentifierConnectionStatus.Disconnect, 30, anprItems));
 
+        //RFID
+        if (rfidStatus) {
+            statusConnectionCards.push(new StatusConnectionCard(
+                GateIdentificationType.RFID,
+                GateIdentificationTestType.Socket,
+                true,
+                IdentifierConnectionStatus.Disconnect,
+                0
+            ));
+        }
 
-        //Kiosk
-        var kioskItems: StatusConnectionCardItems[] = [];
-        kioskItems.push(new StatusConnectionCardItems('Kiosk', IdentifierConnectionStatus.Disconnect, undefined));
-        statusConnectionCards.push(new StatusConnectionCard(GateIdentificationType.Kiosk, IdentifierConnectionStatus.Disconnect, 30, kioskItems));
+        //LocalAgent
+        statusConnectionCards.push(new StatusConnectionCard(
+            GateIdentificationType.LocalAgent,
+            GateIdentificationTestType.Server,
+            true,
+            IdentifierConnectionStatus.Connect,
+            15
+        ));
 
+        //ServiceServer
+        statusConnectionCards.push(new StatusConnectionCard(
+            GateIdentificationType.ServiceServer,
+            GateIdentificationTestType.Server,
+            false,
+            IdentifierConnectionStatus.Disconnect,
+            10
+        ));
 
         var taxiOperation = document.taxiWorkModeInfo.taxiOperation;
 
@@ -161,12 +171,9 @@ export default function operatorRepository() {
             document.taxiWorkMode,
             document.offlineMode,
             document.trafficControlWorkMode,
-            document.taxiWorkModeInfo.vehicleDetectTools.includes(VehicleDetectTools.RFID) || document.trafficControlWorkModeInfo.vehicleDetectTools.includes(VehicleDetectTools.RFID),
-            document.taxiWorkModeInfo.vehicleDetectTools.includes(VehicleDetectTools.ANPR) || document.trafficControlWorkModeInfo.vehicleDetectTools.includes(VehicleDetectTools.ANPR),
-            document.taxiWorkModeInfo.humanDetectTools.includes(HumanDetectTools.HF) || document.trafficControlWorkModeInfo.humanDetectTools.includes(HumanDetectTools.HF),
-            IdentifierConnectionStatus.Disconnect,
-            IdentifierConnectionStatus.Disconnect,
-            IdentifierConnectionStatus.Disconnect,
+            rfidStatus,
+            anprStatus,
+            hfStatus,
             statusConnectionCards,
             taxiOperation
         );
@@ -236,13 +243,13 @@ export default function operatorRepository() {
 
             data.push(new IdentificationProcessGridModel(
                 new Date(),
-                'ماشین وزیر راه'+i,
+                'ماشین وزیر راه' + i,
                 IdentificationProcessStatus.Successful,
                 '45-الف-586-22',
                 VehiclePlaqueType.Personal,
                 true,
                 true,
-                'علی حیدری'+i,
+                'علی حیدری' + i,
                 'سواری پلاس',
                 IdentificationProcessTrafficType.TrafficControl
 

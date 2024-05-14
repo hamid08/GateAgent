@@ -208,7 +208,7 @@ export const initConnection = () => {
         socket.on('OfflineModeFailed', (data: any) => {
             // sendToScreen(data)
             console.log(JSON.stringify(data));
-          
+
 
         });
 
