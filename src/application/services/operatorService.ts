@@ -164,7 +164,7 @@ export default function operatorService() {
 
     const cancelProcess = async (gateId: string): Promise<IOperator_IdentityResultBox_Model> => {
 
-        //TODO Save InDb Information And Finish Process
+        await identificationProcessService().finishProcessInGate(gateId, IdentificationProcessStatus.UnSuccessful, IdentificationProcessFinishReason.CancelByOperator);
 
         var message: IOperator_IdentityResultBox_Model = {
             description: 'فرآیند شناسایی و عملیات لغو شد',
