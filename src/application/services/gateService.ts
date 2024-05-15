@@ -33,6 +33,11 @@ export default function gateService() {
         return '';
     }
 
+    async function getGateIds(): Promise<string[] | []> {
+
+        return await gateSettingRepository().getGateIds();
+    }
+
     async function getGateIdsQueryString(): Promise<string> {
         var gateIdsStr = '';
 
@@ -380,6 +385,7 @@ export default function gateService() {
         // Common
         upsertHistoryUpdateRequest,
         syncTrafficGroups,
-        sendSyncDataRequest
+        sendSyncDataRequest,
+        getGateIds
     }
 }

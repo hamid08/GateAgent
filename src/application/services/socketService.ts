@@ -39,7 +39,7 @@ import {
 } from '../models/operatorModels';
 
 import identificationProcessRedisRepository from '../../frameworks/database/redis/identificationProcessRedisRepository';
-import { AcceptanceType, IdentificationProcessStatus, IdentificationProcessTrafficType, IdentityMessageType, IdentityResultType, SmartGatePriority, SmartGateType, VehiclePlaqueType } from '../enums/gateEnum';
+import { AcceptanceType, IdentificationProcessStatus, IdentificationProcessTrafficType, IdentityMessageType, IdentityResultType, SmartGatePriority, SmartGateType, TaxiWorkModeOperation, VehiclePlaqueType } from '../enums/gateEnum';
 
 import config from '../../config/config';
 
@@ -879,7 +879,7 @@ export default function socketService() {
 
                     //#region Create IdentificationProcess By Type Taxi
 
-                    await createProcess(gateId, IdentificationProcessTrafficType.Taxi, anprRedisData, rfidRedisData, hfRedisData);
+                    await createProcess(gateId, gateSetting, IdentificationProcessTrafficType.Taxi, anprRedisData, rfidRedisData, hfRedisData);
 
                     //#endregion
 
@@ -896,7 +896,7 @@ export default function socketService() {
 
                     //#region Create IdentificationProcess By Type Taxi
 
-                    await createProcess(gateId, IdentificationProcessTrafficType.Taxi, anprRedisData, rfidRedisData, hfRedisData);
+                    await createProcess(gateId, gateSetting, IdentificationProcessTrafficType.Taxi, anprRedisData, rfidRedisData, hfRedisData);
 
                     //#endregion
 
@@ -985,7 +985,7 @@ export default function socketService() {
 
                     //#region Create IdentificationProcess By Type TrafficControl
 
-                    await createProcess(gateId, IdentificationProcessTrafficType.TrafficControl, anprRedisData, rfidRedisData, hfRedisData);
+                    await createProcess(gateId, gateSetting, IdentificationProcessTrafficType.TrafficControl, anprRedisData, rfidRedisData, hfRedisData);
 
                     //#endregion
 
@@ -1001,7 +1001,7 @@ export default function socketService() {
 
                     //#region Create IdentificationProcess By Type TrafficControl
 
-                    await createProcess(gateId, IdentificationProcessTrafficType.TrafficControl, anprRedisData, rfidRedisData, hfRedisData);
+                    await createProcess(gateId, gateSetting, IdentificationProcessTrafficType.TrafficControl, anprRedisData, rfidRedisData, hfRedisData);
 
                     //#endregion
                 }
@@ -1094,7 +1094,7 @@ export default function socketService() {
 
                     //#region Create IdentificationProcess By Type Taxi
 
-                    await createProcess(gateId, IdentificationProcessTrafficType.Taxi, anprRedisData, rfidRedisData, hfRedisData);
+                    await createProcess(gateId, gateSetting, IdentificationProcessTrafficType.Taxi, anprRedisData, rfidRedisData, hfRedisData);
 
                     //#endregion
 
@@ -1149,7 +1149,7 @@ export default function socketService() {
 
                     //#region Create IdentificationProcess By Type Taxi
 
-                    await createProcess(gateId, IdentificationProcessTrafficType.Taxi, anprRedisData, rfidRedisData, hfRedisData);
+                    await createProcess(gateId, gateSetting, IdentificationProcessTrafficType.Taxi, anprRedisData, rfidRedisData, hfRedisData);
 
                     //#endregion
 
@@ -1229,7 +1229,7 @@ export default function socketService() {
 
                     //#region Create IdentificationProcess By Type TrafficControl
 
-                    await createProcess(gateId, IdentificationProcessTrafficType.TrafficControl, anprRedisData, rfidRedisData, hfRedisData);
+                    await createProcess(gateId, gateSetting, IdentificationProcessTrafficType.TrafficControl, anprRedisData, rfidRedisData, hfRedisData);
 
                     //#endregion
 
@@ -1285,7 +1285,7 @@ export default function socketService() {
 
                     //#region Create IdentificationProcess By Type TrafficControl
 
-                    await createProcess(gateId, IdentificationProcessTrafficType.TrafficControl, anprRedisData, rfidRedisData, hfRedisData);
+                    await createProcess(gateId, gateSetting, IdentificationProcessTrafficType.TrafficControl, anprRedisData, rfidRedisData, hfRedisData);
 
                     //#endregion
 
@@ -1377,7 +1377,7 @@ export default function socketService() {
 
                     //#region Create IdentificationProcess By Type Taxi
 
-                    await createProcess(gateId, IdentificationProcessTrafficType.Taxi, anprRedisData, rfidRedisData, hfRedisData);
+                    await createProcess(gateId, gateSetting, IdentificationProcessTrafficType.Taxi, anprRedisData, rfidRedisData, hfRedisData);
 
                     //#endregion
 
@@ -1432,7 +1432,7 @@ export default function socketService() {
 
                     //#region Create IdentificationProcess By Type Taxi
 
-                    await createProcess(gateId, IdentificationProcessTrafficType.Taxi, anprRedisData, rfidRedisData, hfRedisData);
+                    await createProcess(gateId, gateSetting, IdentificationProcessTrafficType.Taxi, anprRedisData, rfidRedisData, hfRedisData);
 
                     //#endregion
 
@@ -1508,7 +1508,7 @@ export default function socketService() {
 
                     //#region Create IdentificationProcess By Type TrafficControl
 
-                    await createProcess(gateId, IdentificationProcessTrafficType.TrafficControl, anprRedisData, rfidRedisData, hfRedisData);
+                    await createProcess(gateId, gateSetting, IdentificationProcessTrafficType.TrafficControl, anprRedisData, rfidRedisData, hfRedisData);
 
                     //#endregion
 
@@ -1531,7 +1531,7 @@ export default function socketService() {
 
                             // Check Detect RFID In Redis
                             if (!rfidRedisDetected) {
-        
+
                                 //#region  Send Message To IdentityResultBox
                                 var message: IOperator_IdentityResultBox_Model = {
                                     description: 'شناسایی تگ رادیویی خودرو انجام نشده است, خودرو را در محل مناسب قرار دهید',
@@ -1563,7 +1563,7 @@ export default function socketService() {
 
                     //#region Create IdentificationProcess By Type TrafficControl
 
-                    await createProcess(gateId, IdentificationProcessTrafficType.TrafficControl, anprRedisData, rfidRedisData, hfRedisData);
+                    await createProcess(gateId, gateSetting, IdentificationProcessTrafficType.TrafficControl, anprRedisData, rfidRedisData, hfRedisData);
 
                     //#endregion
 
@@ -1578,9 +1578,10 @@ export default function socketService() {
 
     }
 
-    const createProcess = async function (gateId: string, trafficType: IdentificationProcessTrafficType,
+    const createProcess = async function (gateId: string, gateSetting: SmartGateModel, trafficType: IdentificationProcessTrafficType,
         anprInfo: ANPRCacheDataModel | null, rfidInfo: RFIDCacheDataModel | null, hfInfo: HFCacheDataModel | null) {
 
+        //#region Create Process
         var name_Process: string = '';
         var anpr_Process: boolean = false;
         var rfid_Process: boolean = rfidInfo && rfidInfo != null ? true : false;
@@ -1652,6 +1653,32 @@ export default function socketService() {
         };
 
         await identificationProcessService().addNewProcess(newProcess);
+
+        //#endregion
+
+
+        //#region After Create Process
+
+        var needTripNumber: boolean = false;
+
+        if (trafficType == IdentificationProcessTrafficType.Taxi &&
+            gateSetting.taxiWorkModeInfo.taxiOperation == TaxiWorkModeOperation.AssignTripToDriver
+        ) needTripNumber = true;
+
+        // Send FinishProcess Socket
+
+        io.to(gateId).emit(config.socket.finishProcessSocket, {
+
+            name: name_Process,
+            vehicleIdentity: vehicleId_Process,
+            needTripNumber: needTripNumber
+        });
+
+
+
+        //#endregion
+
+
 
     }
 

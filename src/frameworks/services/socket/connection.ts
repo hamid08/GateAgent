@@ -268,23 +268,4 @@ export async function upsertAlertToANPRListener() {
     }
 }
 
-// export async function sendToScreen(emitName: string, data: any, gateId: string) {
-//     try {
-
-//         const gateWebSockets = sockets.filter(socket => socket.type === GateServicesType.GateWeb);
-
-//         if (gateWebSockets && gateWebSockets.length > 0) {
-
-//             gateWebSockets.forEach(element => {
-//                 element.socket!.to(gateId).emit(emitName, data);
-//             });
-
-//         } else {
-//             console.log(`No Found GateWeb socket connection`);
-//         }
-//     } catch (error) {
-//         console.log(error);
-//     }
-
-// }
 

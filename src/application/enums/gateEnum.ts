@@ -106,7 +106,12 @@ export enum SmartGatePriority {
 }
 
 export enum TaxiWorkModeOperation {
+
+    // حضور در سکو
     InStation = 1,
+
+    // اختصاص سفر به رانند
+    AssignTripToDriver = 2,
 }
 
 export enum SmartGateType {
