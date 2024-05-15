@@ -5,8 +5,8 @@ import {
     Operator_GateDetails_Model,
     StatusConnectionCard,
     LivePlaqueImage,
-    Operator_IdentityResultBoxInfo_Model,
-    Operator_IdentityResultBox_Model,
+    IOperator_IdentityResultBoxInfo_Model,
+    IOperator_IdentityResultBox_Model,
     IdentificationProcessGridModel,
     IdentificationProcessGridFilterModel,
 
@@ -71,6 +71,12 @@ export default function operatorService() {
 
     const detectionState = async (gateId: string): Promise<DetectionStateModel> => {
 
+        var message: IOperator_IdentityResultBox_Model = {
+            description: 'لطفا کارت را بروی کارتخوان قرار دهید',
+            messageType: IdentityMessageType.InsertTheCard,
+            type: IdentityResultType.Info
+        };
+
         return new DetectionStateModel(
             false,
             false,
@@ -93,24 +99,23 @@ export default function operatorService() {
                 VehiclePlaqueType.Taxi,
             ),
             undefined,
-            new Operator_IdentityResultBox_Model(
-                IdentityResultType.Info,
-                IdentityMessageType.InsertTheCard,
-                'لطفا کارت را بروی کارتخوان قرار دهید',
-            )
-
-
+            message
         );
 
     }
 
 
-    const cancelProcess = async (gateId: string): Promise<Operator_IdentityResultBox_Model> => {
+    const cancelProcess = async (gateId: string): Promise<IOperator_IdentityResultBox_Model> => {
 
         //TODO Save InDb Information And Finish Process
 
+        var message: IOperator_IdentityResultBox_Model = {
+            description: 'فرآیند شناسایی و عملیات لغو شد',
+            messageType: IdentityMessageType.CancelProcess,
+            type: IdentityResultType.Error
+        };
 
-        return new Operator_IdentityResultBox_Model(IdentityResultType.Error, IdentityMessageType.CancelProcess, 'فرآیند شناسایی و عملیات لغو شد');
+        return message;
 
     }
 
@@ -118,16 +123,23 @@ export default function operatorService() {
 
 
 
-    const finishProcess = async (gateId: string, tripNumber?: string): Promise<Operator_IdentityResultBox_Model> => {
+    const finishProcess = async (gateId: string, tripNumber?: string): Promise<IOperator_IdentityResultBox_Model> => {
 
         //TODO Save InDb Information And Finish Process
 
+        var identityInfo: IOperator_IdentityResultBoxInfo_Model = {
+            name: 'علی حیدری',
+            vehicleIdentity: '1A4Bn'
+        };
 
+        var message: IOperator_IdentityResultBox_Model = {
+            description: 'اختصاص سفر به راننده با موفقیت انجام شد',
+            messageType: IdentityMessageType.AllowedToPass,
+            type: IdentityResultType.Success,
+            identityInfo: identityInfo
+        };
 
-
-        return new Operator_IdentityResultBox_Model(IdentityResultType.Success, IdentityMessageType.AllowedToPass, 'اختصاص سفر به راننده با موفقیت انجام شد',
-            new Operator_IdentityResultBoxInfo_Model('علی حیدری', '1A4Bn')
-        );
+        return message;
 
     }
 
@@ -157,7 +169,7 @@ export default function operatorService() {
 
                 case GateIdentificationType.ANPR:
 
-                    if (anprSocketInfo) {
+                    if (anprSocketInfo && anprSocketInfo != null) {
                         c.status = IdentifierConnectionStatus.Connect;
                     }
 
@@ -165,7 +177,7 @@ export default function operatorService() {
 
                 case GateIdentificationType.RFID:
 
-                    if (rfidSocketInfo) {
+                    if (rfidSocketInfo && rfidSocketInfo != null) {
                         c.status = IdentifierConnectionStatus.Connect;
                     }
 

@@ -13,6 +13,7 @@ import { setSocketIo, initConnection } from './frameworks/services/socket/connec
 
 import gateService from './application/services/gateSettingService';
 import userService from './application/services/userService';
+import identificationProcessService from './application/services/identificationProcessService';
 
 import { createServer } from 'http';
 
@@ -55,6 +56,7 @@ const runApplication = async () => {
   await redisConnection;
   await gateService().initGateSetting();
   await userService().createDefaultUser();
+  await identificationProcessService().finishAllProcess();
 }
 
 runApplication();

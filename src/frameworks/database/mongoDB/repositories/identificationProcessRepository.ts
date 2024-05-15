@@ -14,22 +14,28 @@ export default function identificationProcessRepository() {
         return await newProcess.save();
     }
 
-    const finishedProcess = async () => {
 
-        const currentProcess = await IdentificationProcess.findOne({ finishedProcess: false });
-
-        if (currentProcess) {
-
-            currentProcess.finishedProcess = true;
-
-            return currentProcess.save();
-
+    
+    const finishAllProcess = async (): Promise<void> => {
+        try {
+            await IdentificationProcess.updateMany({ finishedProcess: false }, { $set: { finishedProcess: true } });
+        } catch (error) {
+            console.error(`Error updating finished all processe gates : ${error}`);
         }
-    }
+    };
 
-    const isRunProcess = async (): Promise<boolean> => {
+    const finishProcessInGate = async (gateId:string): Promise<void> => {
+        try {
+            await IdentificationProcess.updateMany({ finishedProcess: false,gateId:gateId }, { $set: { finishedProcess: true } });
+        } catch (error) {
+            console.error(`Error updating finished processe in gate ${gateId}: ${error}`);
+        }
+    };
 
-        const currentProcess = await IdentificationProcess.findOne({ finishedProcess: false });
+
+    const checkRuningProcessInGate = async (gateId:string): Promise<boolean> => {
+
+        const currentProcess = await IdentificationProcess.findOne({ finishedProcess: false,gateId:gateId });
 
         if (currentProcess) return true;
 
@@ -40,8 +46,9 @@ export default function identificationProcessRepository() {
     return {
 
         addNewProcess,
-        finishedProcess,
-        isRunProcess
+        finishAllProcess,
+        checkRuningProcessInGate,
+        finishProcessInGate
 
     }
 

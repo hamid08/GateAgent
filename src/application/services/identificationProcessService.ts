@@ -22,22 +22,15 @@ export default function identificationProcessService() {
     }
 
 
-    const finishedProcess = async () => {
+    const finishAllProcess = async (): Promise<void> => await identificationProcessRepository().finishAllProcess();
+    const finishProcessInGate = async (gateId:string): Promise<void> => await identificationProcessRepository().finishProcessInGate(gateId);
+
+
+    const checkRuningProcessInGate = async (gateId:string): Promise<boolean> => {
 
         try {
 
-            return await identificationProcessRepository().finishedProcess();
-
-        } catch (error) {
-            console.log(error);
-        }
-    }
-
-    const isRunProcess = async (): Promise<boolean> => {
-
-        try {
-
-            return await identificationProcessRepository().isRunProcess();
+            return await identificationProcessRepository().checkRuningProcessInGate(gateId);
 
         } catch (error) {
             console.log(error);
@@ -48,9 +41,9 @@ export default function identificationProcessService() {
 
     return {
         addNewProcess,
-        finishedProcess,
-        isRunProcess
-
+        finishAllProcess,
+        checkRuningProcessInGate,
+        finishProcessInGate
     }
 
 }

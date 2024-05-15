@@ -41,8 +41,17 @@ export default function identificationProcessRedisRepository() {
 
             return JSON.parse(value);
         } catch (error) {
-            console.error(`Error getting RFID data: ${error}`);
+            console.error(`Error getting RFID data in redis: ${error}`);
             return null;
+        }
+    }
+
+
+    async function delRFID(gateId: string): Promise<void> {
+        try {
+            await redisClient.hDel(`RFID_${gateId}`, 'data');
+        } catch (error) {
+            console.error(`Error delete RFID data in redis: ${error}`);
         }
     }
 
@@ -71,10 +80,19 @@ export default function identificationProcessRedisRepository() {
 
             return JSON.parse(value);
         } catch (error) {
-            console.error(`Error getting HF data: ${error}`);
+            console.error(`Error getting HF data in redis: ${error}`);
             return null;
         }
     }
+
+    async function delHF(gateId: string): Promise<void> {
+        try {
+            await redisClient.hDel(`HF_${gateId}`, 'data');
+        } catch (error) {
+            console.error(`Error delete HF data in redis: ${error}`);
+        }
+    }
+
 
 
     async function setANPR(data: ANPRCacheDataModel): Promise<void> {
@@ -103,6 +121,14 @@ export default function identificationProcessRedisRepository() {
         } catch (error) {
             console.error(`Error getting ANPR data: ${error}`);
             return null;
+        }
+    }
+
+    async function delANPR(gateId: string): Promise<void> {
+        try {
+            await redisClient.hDel(`ANPR_${gateId}`, 'data');
+        } catch (error) {
+            console.error(`Error delete ANPR data In Redis: ${error}`);
         }
     }
 
@@ -136,6 +162,7 @@ export default function identificationProcessRedisRepository() {
     }
 
 
+
     return {
         setRFID,
         getRFID,
@@ -147,8 +174,11 @@ export default function identificationProcessRedisRepository() {
         getANPR,
 
         existTemporaryLockProcess,
-        setTemporaryLockProcess
+        setTemporaryLockProcess,
 
+        delANPR,
+        delHF,
+        delRFID
 
     }
 

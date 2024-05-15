@@ -11,50 +11,6 @@ import {
 
 
 export interface IdentificationProcessModel {
-
-    // constructor(
-    //     gateId: string,
-    //     startProcessTime: Date,
-    //     endProcessTime: Date,
-    //     status: IdentificationProcessStatus, // وضعیت
-    //     finishedProcess: boolean,
-    //     name: string, // شناسه / نام
-    //     hf: boolean,
-    //     anpr: boolean,
-    //     rfid: boolean,
-    //     trafficType: IdentificationProcessTrafficType, // نوع تردد
-    //     permissionTrafficGroupId?: string, // شناسه کنترل ترددی
-    //     vehicleId?: string, // شناسه خودرو
-    //     driverId?: string,
-
-    //     driverFullName?: string,
-
-    //     plaqueNo?: string,
-    //     plaqueType?: VehiclePlaqueType,
-    //     vehicleType?: string,
-    // ) {
-
-    //     this.gateId = gateId;
-    //     this.startProcessTime = startProcessTime;
-    //     this.endProcessTime = endProcessTime;
-    //     this.status = status;
-    //     this.finishedProcess = finishedProcess;
-    //     this.plaqueType = plaqueType;
-    //     this.name = name;
-    //     this.hf = hf;
-    //     this.anpr = anpr;
-    //     this.rfid = rfid;
-    //     this.trafficType = trafficType;
-    //     this.permissionTrafficGroupId = permissionTrafficGroupId;
-    //     this.vehicleId = vehicleId;
-    //     this.driverId = driverId;
-    //     this.driverFullName = driverFullName;
-    //     this.plaqueNo = plaqueNo;
-    //     this.plaqueType = plaqueType;
-    //     this.vehicleType = vehicleType;
-
-    // }
-
     gateId: string;
     startProcessTime: Date;
     endProcessTime?: Date;

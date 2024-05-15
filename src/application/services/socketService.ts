@@ -31,8 +31,15 @@ import {
 
 } from '../models/identificationProcessModels';
 
+
+import {
+    IOperator_IdentityResultBox_Model,
+    IOperator_IdentityResultBoxInfo_Model
+
+} from '../models/operatorModels';
+
 import identificationProcessRedisRepository from '../../frameworks/database/redis/identificationProcessRedisRepository';
-import { AcceptanceType, IdentificationProcessStatus, IdentificationProcessTrafficType, SmartGatePriority, SmartGateType, VehiclePlaqueType } from '../enums/gateEnum';
+import { AcceptanceType, IdentificationProcessStatus, IdentificationProcessTrafficType, IdentityMessageType, IdentityResultType, SmartGatePriority, SmartGateType, VehiclePlaqueType } from '../enums/gateEnum';
 
 import config from '../../config/config';
 
@@ -55,7 +62,7 @@ export default function socketService() {
 
     const checkIsRunProcessOrTemporaryLockProcess = async function (gateId: string): Promise<boolean> {
 
-        return await identificationProcessService().isRunProcess() || await _redisRepository.existTemporaryLockProcess(gateId);
+        return await identificationProcessService().checkRuningProcessInGate(gateId) || await _redisRepository.existTemporaryLockProcess(gateId);
     }
 
     const processRFIDTag = async function (tagData: TagDataModel) {
@@ -100,7 +107,7 @@ export default function socketService() {
 
                     if (!permissionTrafficGroup || permissionTrafficGroup == null) { // Not Found In TrafficControl List
 
-                        await io.to(gateId).emit("RFIDData", new RFIDDataSocketModel(gateId, false));
+                        await io.to(gateId).emit(config.socket.rfidDataSocket, new RFIDDataSocketModel(gateId, false));
                         console.info(`In ProcessRFIDTag Not Found In TrafficControl List & Taxi List!`);
                         await _redisRepository.setRFID(rfidRedisData);
 
@@ -119,7 +126,7 @@ export default function socketService() {
 
                         await _redisRepository.setRFID(rfidRedisData);
 
-                        await io.to(gateId).emit("RFIDData", new RFIDDataSocketModel(
+                        await io.to(gateId).emit(config.socket.rfidDataSocket, new RFIDDataSocketModel(
                             gateId,
                             true,
                             permissionTrafficGroup.name,
@@ -138,7 +145,7 @@ export default function socketService() {
                     }
                 }
                 else {
-                    await io.to(gateId).emit("RFIDData", new RFIDDataSocketModel(gateId, false));
+                    await io.to(gateId).emit(config.socket.rfidDataSocket, new RFIDDataSocketModel(gateId, false));
                     console.info(`In ProcessRFIDTag Not Found In TrafficControl List & Taxi List!`);
                     await _redisRepository.setRFID(rfidRedisData);
 
@@ -163,7 +170,7 @@ export default function socketService() {
 
                 await _redisRepository.setRFID(rfidRedisData);
 
-                await io.to(gateId).emit("RFIDData", new RFIDDataSocketModel(
+                await io.to(gateId).emit(config.socket.rfidDataSocket, new RFIDDataSocketModel(
                     gateId,
                     true,
                     '',
@@ -200,7 +207,7 @@ export default function socketService() {
 
                     if (!vehicle || vehicle == null) { // Not Found In Taxi List
 
-                        await io.to(gateId).emit("RFIDData", new RFIDDataSocketModel(gateId, false));
+                        await io.to(gateId).emit(config.socket.rfidDataSocket, new RFIDDataSocketModel(gateId, false));
                         console.info(`In ProcessRFIDTag Not Found In TrafficControl List & Taxi List!`);
                         await _redisRepository.setRFID(rfidRedisData);
 
@@ -222,7 +229,7 @@ export default function socketService() {
 
                         await _redisRepository.setRFID(rfidRedisData);
 
-                        await io.to(gateId).emit("RFIDData", new RFIDDataSocketModel(
+                        await io.to(gateId).emit(config.socket.rfidDataSocket, new RFIDDataSocketModel(
                             gateId,
                             true,
                             '',
@@ -241,7 +248,7 @@ export default function socketService() {
                     }
                 }
                 else {
-                    await io.to(gateId).emit("RFIDData", new RFIDDataSocketModel(gateId, false));
+                    await io.to(gateId).emit(config.socket.rfidDataSocket, new RFIDDataSocketModel(gateId, false));
                     console.info(`In ProcessRFIDTag Not Found In TrafficControl List & Taxi List!`);
                     await _redisRepository.setRFID(rfidRedisData);
 
@@ -265,7 +272,7 @@ export default function socketService() {
                 await _redisRepository.setRFID(rfidRedisData);
 
 
-                await io.to(gateId).emit("RFIDData", new RFIDDataSocketModel(
+                await io.to(gateId).emit(config.socket.rfidDataSocket, new RFIDDataSocketModel(
                     gateId,
                     true,
                     permissionTrafficGroup.name,
@@ -287,6 +294,8 @@ export default function socketService() {
         }
 
     }
+
+
 
     const processANPRPlate = async function (plateData: ANPRDataModel) {
 
@@ -330,7 +339,7 @@ export default function socketService() {
 
                     if (!permissionTrafficGroup || permissionTrafficGroup == null) { // Not Found In TrafficControl List
 
-                        await io.to(gateId).emit("ANPRData", new ANPRDataSocketModel(gateId, false, plateData.DateTime, plateData.image));
+                        await io.to(gateId).emit(config.socket.anprDataSocket, new ANPRDataSocketModel(gateId, false, plateData.DateTime, plateData.image));
                         console.info(`In ProcessANPRPlate Not Found In TrafficControl List & Taxi List!`);
                         await _redisRepository.setANPR(anprRedisData);
 
@@ -349,7 +358,7 @@ export default function socketService() {
 
                         await _redisRepository.setANPR(anprRedisData);
 
-                        await io.to(gateId).emit("ANPRData", new ANPRDataSocketModel(
+                        await io.to(gateId).emit(config.socket.anprDataSocket, new ANPRDataSocketModel(
                             gateId,
                             true,
                             plateData.DateTime,
@@ -371,7 +380,7 @@ export default function socketService() {
                     }
                 }
                 else {
-                    await io.to(gateId).emit("ANPRData", new ANPRDataSocketModel(gateId, false, plateData.DateTime, plateData.image));
+                    await io.to(gateId).emit(config.socket.anprDataSocket, new ANPRDataSocketModel(gateId, false, plateData.DateTime, plateData.image));
                     console.info(`In ProcessANPRPlate Not Found In TrafficControl List & Taxi List!`);
                     await _redisRepository.setANPR(anprRedisData);
 
@@ -396,7 +405,7 @@ export default function socketService() {
 
                 await _redisRepository.setANPR(anprRedisData);
 
-                await io.to(gateId).emit("ANPRData", new ANPRDataSocketModel(
+                await io.to(gateId).emit(config.socket.anprDataSocket, new ANPRDataSocketModel(
                     gateId,
                     true,
                     plateData.DateTime,
@@ -435,7 +444,7 @@ export default function socketService() {
 
                     if (!vehicle || vehicle == null) { // Not Found In Taxi List
 
-                        await io.to(gateId).emit("ANPRData", new ANPRDataSocketModel(gateId, false, plateData.DateTime, plateData.image));
+                        await io.to(gateId).emit(config.socket.anprDataSocket, new ANPRDataSocketModel(gateId, false, plateData.DateTime, plateData.image));
                         console.info(`In ProcessANPRPlate Not Found In TrafficControl List & Taxi List!`);
                         await _redisRepository.setANPR(anprRedisData);
 
@@ -457,7 +466,7 @@ export default function socketService() {
 
                         await _redisRepository.setANPR(anprRedisData);
 
-                        await io.to(gateId).emit("ANPRData", new ANPRDataSocketModel(
+                        await io.to(gateId).emit(config.socket.anprDataSocket, new ANPRDataSocketModel(
                             gateId,
                             true,
                             plateData.DateTime,
@@ -478,7 +487,7 @@ export default function socketService() {
                     }
                 }
                 else {
-                    await io.to(gateId).emit("ANPRData", new ANPRDataSocketModel(gateId, false, plateData.DateTime, plateData.image));
+                    await io.to(gateId).emit(config.socket.anprDataSocket, new ANPRDataSocketModel(gateId, false, plateData.DateTime, plateData.image));
                     console.info(`In ProcessANPRPlate Not Found In TrafficControl List & Taxi List!`);
                     await _redisRepository.setANPR(anprRedisData);
 
@@ -502,7 +511,7 @@ export default function socketService() {
 
                 await _redisRepository.setANPR(anprRedisData);
 
-                await io.to(gateId).emit("ANPRData", new ANPRDataSocketModel(
+                await io.to(gateId).emit(config.socket.anprDataSocket, new ANPRDataSocketModel(
                     gateId,
                     true,
                     plateData.DateTime,
@@ -568,7 +577,7 @@ export default function socketService() {
 
                     if (!permissionTrafficGroup || permissionTrafficGroup == null) { // Not Found In TrafficControl List
 
-                        await io.to(gateId).emit("HFData", new HFDataSocketModel(gateId, false));
+                        await io.to(gateId).emit(config.socket.hfDataSocket, new HFDataSocketModel(gateId, false));
                         console.info(`In ProcessHFCard Not Found In TrafficControl List & Taxi List!`);
                         await _redisRepository.setHF(hfRedisData);
 
@@ -585,7 +594,7 @@ export default function socketService() {
 
                         await _redisRepository.setHF(hfRedisData);
 
-                        await io.to(gateId).emit("HFData", new HFDataSocketModel(
+                        await io.to(gateId).emit(config.socket.hfDataSocket, new HFDataSocketModel(
                             gateId,
                             true,
                             permissionTrafficGroup.name,
@@ -600,7 +609,7 @@ export default function socketService() {
                     }
                 }
                 else {
-                    await io.to(gateId).emit("HFData", new HFDataSocketModel(gateId, false));
+                    await io.to(gateId).emit(config.socket.hfDataSocket, new HFDataSocketModel(gateId, false));
                     console.info(`In ProcessHFCard Not Found In TrafficControl List & Taxi List!`);
                     await _redisRepository.setHF(hfRedisData);
 
@@ -625,7 +634,7 @@ export default function socketService() {
 
                 await _redisRepository.setHF(hfRedisData);
 
-                await io.to(gateId).emit("HFData", new HFDataSocketModel(
+                await io.to(gateId).emit(config.socket.hfDataSocket, new HFDataSocketModel(
                     gateId,
                     true,
                     'محمد رضا احدی',
@@ -662,7 +671,7 @@ export default function socketService() {
 
                     if (!driver || driver == null) { // Not Found In Taxi List
 
-                        await io.to(gateId).emit("HFData", new HFDataSocketModel(gateId, false));
+                        await io.to(gateId).emit(config.socket.hfDataSocket, new HFDataSocketModel(gateId, false));
                         console.info(`In ProcessHFCard Not Found In TrafficControl List & Taxi List!`);
                         await _redisRepository.setHF(hfRedisData);
 
@@ -684,7 +693,7 @@ export default function socketService() {
 
                         await _redisRepository.setHF(hfRedisData);
 
-                        await io.to(gateId).emit("HFData", new HFDataSocketModel(
+                        await io.to(gateId).emit(config.socket.hfDataSocket, new HFDataSocketModel(
                             gateId,
                             true,
                             'محمد رضا احدی',
@@ -702,7 +711,7 @@ export default function socketService() {
                     }
                 }
                 else {
-                    await io.to(gateId).emit("HFData", new HFDataSocketModel(gateId, false));
+                    await io.to(gateId).emit(config.socket.hfDataSocket, new HFDataSocketModel(gateId, false));
                     console.info(`In ProcessHFCard Not Found In TrafficControl List & Taxi List!`);
                     await _redisRepository.setHF(hfRedisData);
 
@@ -724,7 +733,7 @@ export default function socketService() {
 
                 await _redisRepository.setHF(hfRedisData);
 
-                await io.to(gateId).emit("HFData", new HFDataSocketModel(
+                await io.to(gateId).emit(config.socket.hfDataSocket, new HFDataSocketModel(
                     gateId,
                     true,
                     permissionTrafficGroup.name,
@@ -797,16 +806,36 @@ export default function socketService() {
 
                         // Check ANPR Detect In Redis
                         if (!anprRedisDetected) {
-                            //TODO Send Socket For Need ANPR Data In Redis
+
+
+                            //#region  Send Message To IdentityResultBox
+                            var message: IOperator_IdentityResultBox_Model = {
+                                description: 'شناسایی پلاک خودرو توسط دوربین انجام نشده است, خودرو را در محل مناسب قرار دهید',
+                                messageType: IdentityMessageType.IdentificationIsIncomplete,
+                                type: IdentityResultType.Info,
+                            };
+
+                            io.to(gateId).emit("IdentityResultBox", message);
+                            //#endregion
+
 
                             console.warn(`CheckDetection Failed Because Need To ANPRRedisData!`);
                             return;
-
                         }
 
                         // Check Detect RFID In Redis
                         if (!rfidRedisDetected) {
-                            //TODO Send Socket For Need RFID Data In Redis 
+
+                            //#region  Send Message To IdentityResultBox
+                            var message: IOperator_IdentityResultBox_Model = {
+                                description: 'شناسایی تگ رادیویی خودرو انجام نشده است, خودرو را در محل مناسب قرار دهید',
+                                messageType: IdentityMessageType.IdentificationIsIncomplete,
+                                type: IdentityResultType.Info,
+                            };
+
+                            io.to(gateId).emit("IdentityResultBox", message);
+                            //#endregion
+
 
                             console.warn(`CheckDetection Failed Because Need To RFIDRedisData!`);
                             return;
@@ -818,7 +847,15 @@ export default function socketService() {
                         // Check ANPR OR RFID Detect In Redis
                         if (!anprRedisDetected && !rfidRedisDetected) {
 
-                            //TODO Send Socket For Need ANPR OR RFID Data In Redis
+                            //#region  Send Message To IdentityResultBox
+                            var message: IOperator_IdentityResultBox_Model = {
+                                description: 'شناسایی تگ رادیویی  یا پلاک خودرو انجام نشده است, خودرو را در محل مناسب قرار دهید',
+                                messageType: IdentityMessageType.IdentificationIsIncomplete,
+                                type: IdentityResultType.Info,
+                            };
+
+                            io.to(gateId).emit("IdentityResultBox", message);
+                            //#endregion
 
                             console.warn(`CheckDetection Failed Because Need To ANPRRedisData OR RFIDRedisData!`);
                             return;
@@ -884,7 +921,16 @@ export default function socketService() {
 
                         // Check ANPR Detect In Redis
                         if (!anprRedisDetected) {
-                            //TODO Send Socket For Need ANPR Data In Redis
+
+                            //#region  Send Message To IdentityResultBox
+                            var message: IOperator_IdentityResultBox_Model = {
+                                description: 'شناسایی پلاک خودرو توسط دوربین انجام نشده است, خودرو را در محل مناسب قرار دهید',
+                                messageType: IdentityMessageType.IdentificationIsIncomplete,
+                                type: IdentityResultType.Info,
+                            };
+
+                            io.to(gateId).emit("IdentityResultBox", message);
+                            //#endregion
 
                             console.warn(`CheckDetection Failed Because Need To ANPRRedisData!`);
                             return;
@@ -893,7 +939,16 @@ export default function socketService() {
 
                         // Check Detect RFID In Redis
                         if (!rfidRedisDetected) {
-                            //TODO Send Socket For Need RFID Data In Redis Insert
+
+                            //#region  Send Message To IdentityResultBox
+                            var message: IOperator_IdentityResultBox_Model = {
+                                description: 'شناسایی تگ رادیویی خودرو انجام نشده است, خودرو را در محل مناسب قرار دهید',
+                                messageType: IdentityMessageType.IdentificationIsIncomplete,
+                                type: IdentityResultType.Info,
+                            };
+
+                            io.to(gateId).emit("IdentityResultBox", message);
+                            //#endregion
 
                             console.warn(`CheckDetection Failed Because Need To RFIDRedisData!`);
                             return;
@@ -905,7 +960,15 @@ export default function socketService() {
                         // Check ANPR OR RFID Detect In Redis
                         if (!anprRedisDetected && !rfidRedisDetected) {
 
-                            //TODO Send Socket For Need ANPR OR RFID Data In Redis
+                            //#region  Send Message To IdentityResultBox
+                            var message: IOperator_IdentityResultBox_Model = {
+                                description: 'شناسایی تگ رادیویی  یا پلاک خودرو انجام نشده است, خودرو را در محل مناسب قرار دهید',
+                                messageType: IdentityMessageType.IdentificationIsIncomplete,
+                                type: IdentityResultType.Info,
+                            };
+
+                            io.to(gateId).emit("IdentityResultBox", message);
+                            //#endregion
 
                             console.warn(`CheckDetection Failed Because Need To ANPRRedisData OR RFIDRedisData!`);
                             return;
@@ -963,7 +1026,16 @@ export default function socketService() {
 
                     // Check HF Detect In Redis
                     if (!hfRedisDetected) {
-                        //TODO Send Socket For Need HF Data In Redis => Insert Card
+
+                        //#region  Send Message To IdentityResultBox
+                        var message: IOperator_IdentityResultBox_Model = {
+                            description: 'کارت شناسایی را در محل مناسب قرار دهید',
+                            messageType: IdentityMessageType.InsertTheCard,
+                            type: IdentityResultType.Info,
+                        };
+
+                        io.to(gateId).emit("IdentityResultBox", message);
+                        //#endregion
 
                         console.warn(`CheckDetection Failed Because Need To HFRedisData!`);
                         return;
@@ -979,7 +1051,16 @@ export default function socketService() {
 
                         // Check ANPR Detect In Redis
                         if (!anprRedisDetected) {
-                            //TODO Send Socket For Need ANPR Data In Redis
+
+                            //#region  Send Message To IdentityResultBox
+                            var message: IOperator_IdentityResultBox_Model = {
+                                description: 'شناسایی پلاک خودرو توسط دوربین انجام نشده است, خودرو را در محل مناسب قرار دهید',
+                                messageType: IdentityMessageType.IdentificationIsIncomplete,
+                                type: IdentityResultType.Info,
+                            };
+
+                            io.to(gateId).emit("IdentityResultBox", message);
+                            //#endregion
 
                             console.warn(`CheckDetection Failed Because Need To ANPRRedisData!`);
                             return;
@@ -1032,7 +1113,16 @@ export default function socketService() {
 
                             // Check ANPR Detect In Redis
                             if (!anprRedisDetected) {
-                                //TODO Send Socket For Need ANPR Data In Redis
+
+                                //#region  Send Message To IdentityResultBox
+                                var message: IOperator_IdentityResultBox_Model = {
+                                    description: 'شناسایی پلاک خودرو توسط دوربین انجام نشده است, خودرو را در محل مناسب قرار دهید',
+                                    messageType: IdentityMessageType.IdentificationIsIncomplete,
+                                    type: IdentityResultType.Info,
+                                };
+
+                                io.to(gateId).emit("IdentityResultBox", message);
+                                //#endregion
 
                                 console.warn(`CheckDetection Failed Because Need To ANPRRedisData!`);
                                 return;
@@ -1078,7 +1168,17 @@ export default function socketService() {
 
                     // Check HF Detect In Redis
                     if (!hfRedisDetected) {
-                        //TODO Send Socket For Need HF Data In Redis => Insert Card
+
+                        //#region  Send Message To IdentityResultBox
+                        var message: IOperator_IdentityResultBox_Model = {
+                            description: 'کارت شناسایی را در محل مناسب قرار دهید',
+                            messageType: IdentityMessageType.InsertTheCard,
+                            type: IdentityResultType.Info,
+                        };
+
+                        io.to(gateId).emit("IdentityResultBox", message);
+                        //#endregion
+
 
                         console.warn(`CheckDetection Failed Because Need To HFRedisData!`);
                         return;
@@ -1094,7 +1194,16 @@ export default function socketService() {
 
                         // Check ANPR Detect In Redis
                         if (!anprRedisDetected) {
-                            //TODO Send Socket For Need ANPR Data In Redis
+
+                            //#region  Send Message To IdentityResultBox
+                            var message: IOperator_IdentityResultBox_Model = {
+                                description: 'شناسایی پلاک خودرو توسط دوربین انجام نشده است, خودرو را در محل مناسب قرار دهید',
+                                messageType: IdentityMessageType.IdentificationIsIncomplete,
+                                type: IdentityResultType.Info,
+                            };
+
+                            io.to(gateId).emit("IdentityResultBox", message);
+                            //#endregion
 
                             console.warn(`CheckDetection Failed Because Need To ANPRRedisData!`);
                             return;
@@ -1114,14 +1223,6 @@ export default function socketService() {
 
                         if (!anprRedisDetected) anprRedisData = null;
                     }
-
-                    //#endregion
-
-
-                    //#region  Check Driver Is Match By Vehicle
-
-                    //TODO Check Match Driver By Vehicle
-
 
                     //#endregion
 
@@ -1147,7 +1248,17 @@ export default function socketService() {
 
                             // Check ANPR Detect In Redis
                             if (!anprRedisDetected) {
-                                //TODO Send Socket For Need ANPR Data In Redis
+
+                                //#region  Send Message To IdentityResultBox
+                                var message: IOperator_IdentityResultBox_Model = {
+                                    description: 'شناسایی پلاک خودرو توسط دوربین انجام نشده است, خودرو را در محل مناسب قرار دهید',
+                                    messageType: IdentityMessageType.IdentificationIsIncomplete,
+                                    type: IdentityResultType.Info,
+                                };
+
+                                io.to(gateId).emit("IdentityResultBox", message);
+                                //#endregion
+
 
                                 console.warn(`CheckDetection Failed Because Need To ANPRRedisData!`);
                                 return;
@@ -1199,7 +1310,16 @@ export default function socketService() {
 
                     // Check HF Detect In Redis
                     if (!hfRedisDetected) {
-                        //TODO Send Socket For Need HF Data In Redis => Insert Card
+
+                        //#region  Send Message To IdentityResultBox
+                        var message: IOperator_IdentityResultBox_Model = {
+                            description: 'کارت شناسایی را در محل مناسب قرار دهید',
+                            messageType: IdentityMessageType.InsertTheCard,
+                            type: IdentityResultType.Info,
+                        };
+
+                        io.to(gateId).emit("IdentityResultBox", message);
+                        //#endregion
 
                         console.warn(`CheckDetection Failed Because Need To HFRedisData!`);
                         return;
@@ -1219,7 +1339,16 @@ export default function socketService() {
 
                         // Check Detect RFID In Redis
                         if (!rfidRedisDetected) {
-                            //TODO Send Socket For Need RFID Data 
+
+                            //#region  Send Message To IdentityResultBox
+                            var message: IOperator_IdentityResultBox_Model = {
+                                description: 'شناسایی تگ رادیویی خودرو انجام نشده است, خودرو را در محل مناسب قرار دهید',
+                                messageType: IdentityMessageType.IdentificationIsIncomplete,
+                                type: IdentityResultType.Info,
+                            };
+
+                            io.to(gateId).emit("IdentityResultBox", message);
+                            //#endregion
 
                             console.warn(`CheckDetection Failed Because Need To RFIDRedisData!`);
                             return;
@@ -1271,7 +1400,16 @@ export default function socketService() {
 
                             // Check Detect RFID In Redis
                             if (!rfidRedisDetected) {
-                                //TODO Send Socket For Need RFID Data 
+
+                                //#region  Send Message To IdentityResultBox
+                                var message: IOperator_IdentityResultBox_Model = {
+                                    description: 'شناسایی تگ رادیویی خودرو انجام نشده است, خودرو را در محل مناسب قرار دهید',
+                                    messageType: IdentityMessageType.IdentificationIsIncomplete,
+                                    type: IdentityResultType.Info,
+                                };
+
+                                io.to(gateId).emit("IdentityResultBox", message);
+                                //#endregion
 
                                 console.warn(`CheckDetection Failed Because Need To RFIDRedisData!`);
                                 return;
@@ -1312,7 +1450,16 @@ export default function socketService() {
 
                     // Check HF Detect In Redis
                     if (!hfRedisDetected) {
-                        //TODO Send Socket For Need HF Data In Redis => Insert Card
+
+                        //#region  Send Message To IdentityResultBox
+                        var message: IOperator_IdentityResultBox_Model = {
+                            description: 'کارت شناسایی را در محل مناسب قرار دهید',
+                            messageType: IdentityMessageType.InsertTheCard,
+                            type: IdentityResultType.Info,
+                        };
+
+                        io.to(gateId).emit("IdentityResultBox", message);
+                        //#endregion
 
                         console.warn(`CheckDetection Failed Because Need To HFRedisData!`);
                         return;
@@ -1332,7 +1479,16 @@ export default function socketService() {
 
                         // Check Detect RFID In Redis
                         if (!rfidRedisDetected) {
-                            //TODO Send Socket For Need RFID Data 
+
+                            //#region  Send Message To IdentityResultBox
+                            var message: IOperator_IdentityResultBox_Model = {
+                                description: 'شناسایی تگ رادیویی خودرو انجام نشده است, خودرو را در محل مناسب قرار دهید',
+                                messageType: IdentityMessageType.IdentificationIsIncomplete,
+                                type: IdentityResultType.Info,
+                            };
+
+                            io.to(gateId).emit("IdentityResultBox", message);
+                            //#endregion
 
                             console.warn(`CheckDetection Failed Because Need To RFIDRedisData!`);
                             return;
@@ -1375,7 +1531,16 @@ export default function socketService() {
 
                             // Check Detect RFID In Redis
                             if (!rfidRedisDetected) {
-                                //TODO Send Socket For Need RFID Data 
+        
+                                //#region  Send Message To IdentityResultBox
+                                var message: IOperator_IdentityResultBox_Model = {
+                                    description: 'شناسایی تگ رادیویی خودرو انجام نشده است, خودرو را در محل مناسب قرار دهید',
+                                    messageType: IdentityMessageType.IdentificationIsIncomplete,
+                                    type: IdentityResultType.Info,
+                                };
+
+                                io.to(gateId).emit("IdentityResultBox", message);
+                                //#endregion
 
                                 console.warn(`CheckDetection Failed Because Need To RFIDRedisData!`);
                                 return;

@@ -184,17 +184,7 @@ export class LivePlaqueImage {
 
 }
 
-export class Operator_IdentityResultBoxInfo_Model {
-
-    constructor(
-        name: string,
-        vehicleIdentity: string,
-
-    ) {
-
-        this.name = name;
-        this.vehicleIdentity = vehicleIdentity;
-    }
+export interface IOperator_IdentityResultBoxInfo_Model {
 
     name: string;
     vehicleIdentity: string;
@@ -202,27 +192,12 @@ export class Operator_IdentityResultBoxInfo_Model {
 }
 
 
-export class Operator_IdentityResultBox_Model {
-
-    constructor(
-        type: IdentityResultType,
-        messageType: IdentityMessageType,
-        description: string,
-        identityInfo?: Operator_IdentityResultBoxInfo_Model,
-
-    ) {
-
-        this.type = type;
-        this.messageType = messageType;
-        this.description = description;
-        this.identityInfo = identityInfo;
-
-    }
+export interface IOperator_IdentityResultBox_Model {
 
     type: IdentityResultType;
     messageType: IdentityMessageType;
     description: string;
-    identityInfo?: Operator_IdentityResultBoxInfo_Model;
+    identityInfo?: IOperator_IdentityResultBoxInfo_Model;
 
 }
 
@@ -429,7 +404,7 @@ export class DetectionStateModel {
         anprData?: DetectionStateANPRDataModel,
         rfidData?: DetectionStateRFIDDataModel,
         hfData?: DetectionStateHFDataModel,
-        message?: Operator_IdentityResultBox_Model,
+        message?: IOperator_IdentityResultBox_Model,
 
 
     ) {
@@ -448,6 +423,6 @@ export class DetectionStateModel {
     anprData?: DetectionStateANPRDataModel;
     rfidData?: DetectionStateRFIDDataModel;
     hfData?: DetectionStateHFDataModel;
-    message?: Operator_IdentityResultBox_Model;
+    message?: IOperator_IdentityResultBox_Model;
 
 }
