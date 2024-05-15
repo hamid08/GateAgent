@@ -13,10 +13,10 @@ import {
     OfflineTrafficsGridFilterModel,
     OfflineTrafficsGridModel,
 
-    DetectionStateANPRDataModel,
-    DetectionStateHFDataModel,
-    DetectionStateModel,
-    DetectionStateRFIDDataModel
+    IDetectionStateANPRDataModel,
+    IDetectionStateHFDataModel,
+    IDetectionStateModel,
+    IDetectionStateRFIDDataModel
 
 } from '../models/operatorModels';
 
@@ -28,20 +28,29 @@ import gateSettingService from "./gateSettingService";
 import {
     GateIdentificationType,
     GateServicesType,
+    IdentificationProcessFinishReason,
+    IdentificationProcessStatus,
+    IdentificationProcessTrafficType,
     IdentifierConnectionStatus,
     IdentityMessageType,
     IdentityResultType,
+    TaxiWorkModeOperation,
     VehiclePlaqueType,
 
 } from '../enums/gateEnum';
 
-import { testAvailableIpPort } from '../utils/generators';
+import identificationProcessService from './identificationProcessService';
+import identificationProcessRedisRepository from '../../frameworks/database/redis/identificationProcessRedisRepository';
+import mongoRepository from '../../frameworks/database/mongoDB/repositories/gateRepository';
+
 
 import config from '../../config/config';
 
 
 export default function operatorService() {
 
+    var _redisRepository = identificationProcessRedisRepository();
+    const _mongoRepository = mongoRepository();
 
 
     const getGates = async (): Promise<Operator_Gate_Model[] | null> => await operatorRepository().getGates();
@@ -69,39 +78,87 @@ export default function operatorService() {
 
 
 
-    const detectionState = async (gateId: string): Promise<DetectionStateModel> => {
+    const detectionState = async (gateId: string): Promise<IDetectionStateModel> => {
 
-        var message: IOperator_IdentityResultBox_Model = {
-            description: 'لطفا کارت را بروی کارتخوان قرار دهید',
-            messageType: IdentityMessageType.InsertTheCard,
-            type: IdentityResultType.Info
-        };
+        var processInfo = await identificationProcessService().getRunProcessByGateId(gateId);
 
-        return new DetectionStateModel(
-            false,
-            false,
-            new DetectionStateANPRDataModel(
-                '640f5b',
-                true,
-                new Date(),
-                config.socket.image64,
-                '',
-                'B208',
-                '82-ت-686-22',
-                VehiclePlaqueType.Taxi,
-            ),
-            new DetectionStateRFIDDataModel(
-                '640f5b',
-                true,
-                '',
-                'B208',
-                '45-الف-586-22',
-                VehiclePlaqueType.Taxi,
-            ),
-            undefined,
-            message
-        );
+        var hfRedisData = await _redisRepository.getHF(gateId);
+        var anprRedisData = await _redisRepository.getANPR(gateId);
+        var rfidRedisData = await _redisRepository.getRFID(gateId);
 
+        var anprDetection: IDetectionStateANPRDataModel = {
+            dateTime: anprRedisData?.pureData.DateTime!,
+            found: anprRedisData?.detected!,
+            gateId: anprRedisData?.pureData.GateId!,
+            image: anprRedisData?.pureData.image!,
+            name: anprRedisData?.detected && anprRedisData?.detectedData
+                ? anprRedisData?.detectedData?.name : '',
+
+            plaqueNo: anprRedisData?.detected && anprRedisData?.detectedData
+                ? anprRedisData?.detectedData?.plaqueNo : '',
+
+            plaqueType: anprRedisData?.detected && anprRedisData?.detectedData
+                ? anprRedisData?.detectedData?.plaqueType : undefined,
+
+            vehicleIdentity: anprRedisData?.detected && anprRedisData?.detectedData
+                ? anprRedisData?.detectedData?.vehicleIdentity : '',
+        }
+
+
+        var rfidDetection: IDetectionStateRFIDDataModel = {
+            found: rfidRedisData?.detected!,
+            gateId: rfidRedisData?.pureData.GateId!,
+            name: rfidRedisData?.detected && rfidRedisData?.detectedData
+                ? rfidRedisData?.detectedData?.name : '',
+
+            plaqueNo: rfidRedisData?.detected && rfidRedisData?.detectedData
+                ? rfidRedisData?.detectedData?.plaqueNo : '',
+
+            plaqueType: rfidRedisData?.detected && rfidRedisData?.detectedData
+                ? rfidRedisData?.detectedData?.plaqueType : undefined,
+
+            vehicleIdentity: rfidRedisData?.detected && rfidRedisData?.detectedData
+                ? rfidRedisData?.detectedData?.vehicleIdentity : '',
+        }
+
+
+        var hfDetection: IDetectionStateHFDataModel = {
+            found: hfRedisData?.detected!,
+            gateId: hfRedisData?.pureData.gateId!,
+            name: hfRedisData?.detected && hfRedisData?.detectedData
+                ? hfRedisData?.detectedData?.name : '',
+
+            image: hfRedisData?.detected && hfRedisData?.detectedData
+                ? hfRedisData?.detectedData?.driverAvatar : '',
+        }
+
+
+        var needTripNumber: boolean = false;
+        var hasProcess: boolean = false;
+
+        var gateSetting = await _mongoRepository.getSmartGateProccessInfoById(gateId);
+
+        if (processInfo && processInfo != null) {
+            hasProcess = true;
+
+            if (processInfo?.trafficType == IdentificationProcessTrafficType.Taxi &&
+                gateSetting?.taxiWorkModeInfo.taxiOperation == TaxiWorkModeOperation.AssignTripToDriver) {
+
+                needTripNumber = true;
+            }
+
+        }
+
+
+        var detectionState: IDetectionStateModel = {
+            hasProcess,
+            needTripNumber,
+            anprData: anprRedisData && anprRedisData != null ? anprDetection : undefined,
+            hfData: hfRedisData && hfRedisData != null ? hfDetection : undefined,
+            rfidData: rfidRedisData && rfidRedisData != null ? rfidDetection : undefined,
+        }
+
+        return detectionState;
     }
 
 
@@ -125,7 +182,10 @@ export default function operatorService() {
 
     const finishProcess = async (gateId: string, tripNumber?: string): Promise<IOperator_IdentityResultBox_Model> => {
 
-        //TODO Save InDb Information And Finish Process
+        //TODO Get Run Process And Check Need To Call Gate Service And FinishProcess And Check FinishProcess Offline OR Online
+
+
+        await identificationProcessService().finishProcessInGate(gateId, IdentificationProcessStatus.Successful, IdentificationProcessFinishReason.FinishProcess);
 
         var identityInfo: IOperator_IdentityResultBoxInfo_Model = {
             name: 'علی حیدری',

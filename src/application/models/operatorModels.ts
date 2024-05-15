@@ -298,32 +298,7 @@ export class Operator_GateDetails_Model {
 
 //Detection State
 
-export class DetectionStateANPRDataModel {
-
-    constructor(
-        gateId: string,
-        found: boolean,
-        dateTime: Date,
-        image: string,
-        name?: string,
-        vehicleIdentity?: string,
-        plaqueNo?: string,
-        plaqueType?: VehiclePlaqueType,
-
-
-
-    ) {
-
-        this.gateId = gateId;
-        this.found = found;
-        this.dateTime = dateTime;
-        this.image = image;
-        this.name = name;
-        this.vehicleIdentity = vehicleIdentity;
-        this.plaqueNo = plaqueNo;
-        this.plaqueType = plaqueType;
-
-    }
+export interface IDetectionStateANPRDataModel {
 
     gateId: string;
     found: boolean;
@@ -337,28 +312,7 @@ export class DetectionStateANPRDataModel {
 }
 
 
-export class DetectionStateRFIDDataModel {
-
-    constructor(
-        gateId: string,
-        found: boolean,
-        name?: string,
-        vehicleIdentity?: string,
-        plaqueNo?: string,
-        plaqueType?: VehiclePlaqueType,
-
-
-
-    ) {
-
-        this.gateId = gateId;
-        this.found = found;
-        this.name = name;
-        this.vehicleIdentity = vehicleIdentity;
-        this.plaqueNo = plaqueNo;
-        this.plaqueType = plaqueType;
-
-    }
+export interface IDetectionStateRFIDDataModel {
 
     gateId: string;
     found: boolean;
@@ -369,24 +323,7 @@ export class DetectionStateRFIDDataModel {
 
 }
 
-export class DetectionStateHFDataModel {
-
-    constructor(
-        gateId: string,
-        found: boolean,
-        name?: string, // نام راننده یا نام در کنترل تردد
-        image?: string,
-
-
-    ) {
-
-        this.name = name;
-        this.gateId = gateId;
-        this.name = name;
-        this.image = image;
-        this.found = found;
-
-    }
+export interface IDetectionStateHFDataModel {
 
     name?: string;
     gateId: string;
@@ -396,33 +333,12 @@ export class DetectionStateHFDataModel {
 }
 
 
-export class DetectionStateModel {
-
-    constructor(
-        hasProcess: boolean,
-        needTripNumber: boolean,
-        anprData?: DetectionStateANPRDataModel,
-        rfidData?: DetectionStateRFIDDataModel,
-        hfData?: DetectionStateHFDataModel,
-        message?: IOperator_IdentityResultBox_Model,
-
-
-    ) {
-
-        this.anprData = anprData;
-        this.rfidData = rfidData;
-        this.hfData = hfData;
-        this.message = message;
-        this.hasProcess = hasProcess;
-        this.needTripNumber = needTripNumber;
-
-    }
+export interface IDetectionStateModel {
 
     hasProcess: boolean;
     needTripNumber: boolean;
-    anprData?: DetectionStateANPRDataModel;
-    rfidData?: DetectionStateRFIDDataModel;
-    hfData?: DetectionStateHFDataModel;
-    message?: IOperator_IdentityResultBox_Model;
+    anprData?: IDetectionStateANPRDataModel;
+    rfidData?: IDetectionStateRFIDDataModel;
+    hfData?: IDetectionStateHFDataModel;
 
 }

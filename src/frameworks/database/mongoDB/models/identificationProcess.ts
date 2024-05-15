@@ -71,4 +71,4 @@ const identificationProcessSchema = new Schema<IIdentificationProcess>({
 });
 
 
-export const IdentificationProcess = model<IIdentificationProcess>('IdentificationProcess', identificationProcessSchema);
+export default model<IIdentificationProcess>('IdentificationProcess', identificationProcessSchema);

@@ -306,7 +306,7 @@ export default function socketService() {
 
         //Create Pure Tage Data Model For Redis
         var anprRedisData: ANPRCacheDataModel = new ANPRCacheDataModel(
-            new ANPRPureDataModel(plateData.Plate, plateData.CameraId, gateId, plateData.DateTime),
+            new ANPRPureDataModel(plateData.Plate, plateData.CameraId, gateId, plateData.DateTime,plateData.image),
             false,
             undefined
 

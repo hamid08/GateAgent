@@ -35,7 +35,7 @@ export default function identificationProcessService() {
 
                 gateIds.forEach(async c => {
 
-                    await finishProcessInGate(c,IdentificationProcessStatus.UnSuccessful,IdentificationProcessFinishReason.CancelByGateSystem);
+                    await finishProcessInGateWithOutLock(c, IdentificationProcessStatus.UnSuccessful, IdentificationProcessFinishReason.CancelByGateSystem);
                 });
 
 
@@ -45,6 +45,10 @@ export default function identificationProcessService() {
         }
 
     }
+
+    const getRunProcessByGateId = async (gateId: string): Promise<IdentificationProcessModel | null> =>
+        await identificationProcessRepository().getRunProcessByGateId(gateId);
+
 
 
     /**
@@ -76,6 +80,33 @@ export default function identificationProcessService() {
 
     }
 
+     /**
+     * Finish identification process in gate
+     * @param gateId - Gate ID
+     * @param status - Identification process status
+     * @param finishReason - Identification process finish reason
+     * @returns Promise<void>
+    */
+     const finishProcessInGateWithOutLock = async (
+        gateId: string,
+        status: IdentificationProcessStatus,
+        finishReason: IdentificationProcessFinishReason
+    ): Promise<void> => {
+
+        try {
+            await identificationProcessRepository().finishProcessInGate(gateId, status, finishReason);
+
+            await _redisRepository.delANPR(gateId);
+            await _redisRepository.delHF(gateId);
+            await _redisRepository.delRFID(gateId);
+
+        } catch (error) {
+            console.log(`Can Not FinishProcess By GateId: ${gateId} => ${error}`);
+        }
+
+
+    }
+
 
     const checkRuningProcessInGate = async (gateId: string): Promise<boolean> => {
 
@@ -94,7 +125,8 @@ export default function identificationProcessService() {
         addNewProcess,
         finishAllProcess,
         checkRuningProcessInGate,
-        finishProcessInGate
+        finishProcessInGate,
+        getRunProcessByGateId
     }
 
 }

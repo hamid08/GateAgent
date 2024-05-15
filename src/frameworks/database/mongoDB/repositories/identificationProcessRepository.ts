@@ -1,4 +1,4 @@
-import { IdentificationProcess } from "../models/identificationProcess";
+import IdentificationProcess from "../models/identificationProcess";
 
 
 import {
@@ -46,6 +46,18 @@ export default function identificationProcessRepository() {
     };
 
 
+    const getRunProcessByGateId = async (gateId: string): Promise<IdentificationProcessModel | null> => {
+        try {
+            const process = await IdentificationProcess.findOne({ finishedProcess: false, gateId: gateId });
+            if (!process) return null;
+
+            return process;
+        } catch (error) {
+            console.error(`Error fetching process by gateId ${gateId}: ${error}`);
+            return null;
+        }
+    }
+
     const checkRuningProcessInGate = async (gateId: string): Promise<boolean> => {
 
         const currentProcess = await IdentificationProcess.findOne({ finishedProcess: false, gateId: gateId });
@@ -60,7 +72,8 @@ export default function identificationProcessRepository() {
 
         addNewProcess,
         checkRuningProcessInGate,
-        finishProcessInGate
+        finishProcessInGate,
+        getRunProcessByGateId
 
     }
 

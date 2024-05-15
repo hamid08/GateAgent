@@ -159,17 +159,20 @@ export class RFIDDataSocketModel {
 
 export class ANPRPureDataModel {
 
-    constructor(plate: string, cameraId: string, gateId: string, dateTime: Date) {
+    constructor(plate: string, cameraId: string, gateId: string, dateTime: Date,image:string) {
         this.Plate = plate;
         this.CameraId = cameraId;
         this.GateId = gateId;
         this.DateTime = dateTime;
-    }
+        this.image = image;
+      }
+    
+      Plate: string;
+      CameraId: string;
+      GateId: string;
+      DateTime: Date;
+      image:string;
 
-    Plate: string;
-    CameraId: string;
-    GateId: string;
-    DateTime: Date;
 
 }
 
