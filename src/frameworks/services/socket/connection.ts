@@ -127,6 +127,19 @@ export const initConnection = () => {
 
                     status: IdentifierConnectionStatus.Connect
                 });
+
+                if (gateService?.type == GateServicesType.ANPRListener) {
+                    await socketIo.emit('ANPRSocketStatus', {
+                        status: IdentifierConnectionStatus.Connect
+                    });
+                }
+
+                if (gateService?.type == GateServicesType.RFIDListener) {
+                    await socketIo.emit('RFIDSocketStatus', {
+                        status: IdentifierConnectionStatus.Connect
+                    });
+                }
+
             }
 
 
@@ -161,6 +174,18 @@ export const initConnection = () => {
                     status: IdentifierConnectionStatus.Disconnect
                 });
 
+                if (socketInfo?.type == GateServicesType.ANPRListener) {
+                    await socketIo.emit('ANPRSocketStatus', {
+                        status: IdentifierConnectionStatus.Disconnect
+                    });
+                }
+
+                if (socketInfo?.type == GateServicesType.RFIDListener) {
+                    await socketIo.emit('RFIDSocketStatus', {
+                        status: IdentifierConnectionStatus.Disconnect
+                    });
+                }
+
             }
 
 
@@ -182,7 +207,7 @@ export const initConnection = () => {
         socket.on('RFIDTag', (data: any) => {
             // sendToScreen(data)
             // console.log(JSON.stringify(data));
-            socketService().proccesRFIDTag(data);
+            socketService().processRFIDTag(data);
 
         });
 
@@ -190,7 +215,7 @@ export const initConnection = () => {
             // var dateFormat = moment().format('YYYY-MM-DD HH:mm:ss');
             console.log(JSON.stringify(data));
 
-            socketService().proccesANPRPlate(data);
+            socketService().processANPRPlate(data);
 
 
         });
@@ -199,7 +224,7 @@ export const initConnection = () => {
         socket.on('HFCard', (data: any) => {
             // sendToScreen(data)
             // console.log(JSON.stringify(data));
-            socketService().proccesHFCard(data);
+            socketService().processHFCard(data);
         });
 
 

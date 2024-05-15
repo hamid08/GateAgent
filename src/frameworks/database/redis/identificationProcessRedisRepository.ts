@@ -33,10 +33,13 @@ export default function identificationProcessRedisRepository() {
 
     async function getRFID(gateId: string): Promise<RFIDCacheDataModel | null> {
         try {
-            const value: any = await redisClient.get(`RFID_${gateId}`);
-            const data: RFIDCacheDataModel = JSON.parse(value);
+            const value: any = await redisClient.hGet(`RFID_${gateId}`, 'data');
 
-            return data;
+            if (!value) {
+                throw new Error(`No RFID data found for gateId ${gateId}`);
+            }
+
+            return JSON.parse(value);
         } catch (error) {
             console.error(`Error getting RFID data: ${error}`);
             return null;
@@ -60,10 +63,13 @@ export default function identificationProcessRedisRepository() {
 
     async function getHF(gateId: string): Promise<HFCacheDataModel | null> {
         try {
-            const value: any = await redisClient.get(`HF_${gateId}`);
-            const data: HFCacheDataModel = JSON.parse(value);
+            const value: any = await redisClient.hGet(`HF_${gateId}`, 'data');
 
-            return data;
+            if (!value) {
+                throw new Error(`No HF data found for gateId ${gateId}`);
+            }
+
+            return JSON.parse(value);
         } catch (error) {
             console.error(`Error getting HF data: ${error}`);
             return null;
@@ -87,11 +93,13 @@ export default function identificationProcessRedisRepository() {
 
     async function getANPR(gateId: string): Promise<ANPRCacheDataModel | null> {
         try {
-            const value: any = await redisClient.get(`ANPR_${gateId}`);
+            const value: any = await redisClient.hGet(`ANPR_${gateId}`, 'data');
 
-            const data: ANPRCacheDataModel = JSON.parse(value);
+            if (!value) {
+                throw new Error(`No ANPR data found for gateId ${gateId}`);
+            }
 
-            return data;
+            return JSON.parse(value);
         } catch (error) {
             console.error(`Error getting ANPR data: ${error}`);
             return null;
@@ -117,7 +125,7 @@ export default function identificationProcessRedisRepository() {
 
     async function existTemporaryLockProcess(gateId: string): Promise<boolean> {
         try {
-            const value: any = await redisClient.get(`TemporaryLockProcess_${gateId}`);
+            const value: any = await redisClient.hGet(`TemporaryLockProcess_${gateId}`, 'data');
             if (value) return true;
 
             return false;

@@ -81,8 +81,7 @@ export class TrafficGroupModel {
         plaqueType: VehiclePlaqueType,
         plaqueStatus: VehiclePlaqueType,
         rfidTag: string,
-        gateId: string,
-        gateCaption: string,
+        gateIds: string[],
         presenterName: string,
         trafficGroupCaption: string,
         fromDate: Date,
@@ -98,8 +97,7 @@ export class TrafficGroupModel {
         this.plaqueType = plaqueType;
         this.plaqueStatus = plaqueStatus;
         this.rfidTag = rfidTag;
-        this.gateId = gateId;
-        this.gateCaption = gateCaption;
+        this.gateIds = gateIds;
         this.name = name;
         this.presenterName = presenterName;
         this.trafficGroupCaption = trafficGroupCaption;
@@ -114,8 +112,7 @@ export class TrafficGroupModel {
     plaqueType: VehiclePlaqueType;
     plaqueStatus: VehiclePlaqueType;
     rfidTag: string;
-    gateId: string;
-    gateCaption: string;
+    gateIds: string[];
     name: string;
     presenterName: string;
     trafficGroupCaption: string;

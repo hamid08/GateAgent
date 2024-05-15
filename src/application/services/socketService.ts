@@ -770,10 +770,10 @@ export default function socketService() {
         var hfRedisDetected: boolean = hfRedisData && hfRedisData.detected && hfRedisData.detectedData ? true : false;
 
         //RFIDRedisDetected
-        var rfidRedisDetected = rfidRedisData && rfidRedisData.detected && rfidRedisData.detectedData ? true : false;
+        var rfidRedisDetected: boolean = rfidRedisData && rfidRedisData.detected && rfidRedisData.detectedData ? true : false;
 
         //ANPRRedisDetected
-        var anprRedisDetected = anprRedisData && anprRedisData.detected && anprRedisData.detectedData ? true : false;
+        var anprRedisDetected: boolean = anprRedisData && anprRedisData.detected && anprRedisData.detectedData ? true : false;
 
 
 

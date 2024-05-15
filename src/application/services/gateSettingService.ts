@@ -388,15 +388,20 @@ export default function gateService() {
 
         var gateServices = await gateSettingRepository().getGateServices();
 
+        var sockets = getConnectedSocket();
 
-        gateServices.forEach(async c => {
+        if (!sockets && sockets == null) return gateServices;
 
-            var socketInfo = await getConnectedSocket()?.find(x => x.token == c.token);
+        gateServices.forEach(c => {
+
+            var socketInfo = sockets?.find(x => x.token == c.token);
             if (socketInfo) {
                 c.socketStatus = SocketStatus.Connect;
             }
 
         });
+
+
 
         return gateServices;
 

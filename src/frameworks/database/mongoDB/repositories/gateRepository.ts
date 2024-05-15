@@ -268,7 +268,7 @@ export default function gateRepositoryMongoDB() {
     if (pageSize <= 0) pageSize = 10;
 
     const query: any = {
-      gateId,
+      gateIds: { $elemMatch: { $eq: gateId } },
       $or: [
         { plaqueNo: { $regex: `.*${searchTerm}.*`, $options: 'i' } },
         { presenterName: { $regex: `.*${searchTerm}.*`, $options: 'i' } },
@@ -291,7 +291,7 @@ export default function gateRepositoryMongoDB() {
       .skip((pageIndex - 1) * pageSize)
       .limit(pageSize)
       .sort({ name: 1 })
-      .populate('gateId')
+      .populate('gateIds')
       .exec();
 
 
